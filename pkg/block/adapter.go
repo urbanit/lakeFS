@@ -55,7 +55,10 @@ type ObjectPointer struct {
 // contents but different option values, the first supplied option
 // value is retained.
 type PutOpts struct {
-	StorageClass *string // S3 storage class
+	// StorageClass specifies the S3 storage class
+	StorageClass *string
+	// Metadata holds system and user metadata
+	Metadata map[string]string
 }
 
 // WalkOpts is a unique identifier of a prefix in the object store.
@@ -81,6 +84,7 @@ type CreateMultiPartUploadOpts struct {
 // actually reported.
 type Properties struct {
 	StorageClass *string
+	Metadata     map[string]string
 }
 
 // WalkFunc is called for each object visited by the Walk.

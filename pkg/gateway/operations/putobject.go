@@ -217,7 +217,11 @@ func (controller *PutObject) Handle(w http.ResponseWriter, req *http.Request, o 
 func handlePut(w http.ResponseWriter, req *http.Request, o *PathOperation) {
 	o.Incr("put_object")
 	storageClass := StorageClassFromHeader(req.Header)
-	opts := block.PutOpts{StorageClass: storageClass}
+	metadata := o.GetMetadataHeaders(req)
+	opts := block.PutOpts{
+		StorageClass: storageClass,
+		Metadata:     metadata,
+	}
 	blob, err := upload.WriteBlob(req.Context(), o.BlockStore, o.Repository.StorageNamespace, req.Body, req.ContentLength, opts)
 	if err != nil {
 		o.Log(req).WithError(err).Error("could not write request body to block adapter")
@@ -226,7 +230,7 @@ func handlePut(w http.ResponseWriter, req *http.Request, o *PathOperation) {
 	}
 
 	// write metadata
-	err = o.finishUpload(req, blob.Checksum, blob.PhysicalAddress, blob.Size, true)
+	err = o.finishUpload(req, blob.Checksum, blob.PhysicalAddress, blob.Size, true, blob.Metadata)
 	if errors.Is(err, graveler.ErrWriteToProtectedBranch) {
 		_ = o.EncodeError(w, req, gatewayErrors.Codes.ToAPIErr(gatewayErrors.ErrWriteToProtectedBranch))
 		return

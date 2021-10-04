@@ -8,16 +8,19 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func TestEntryToValueAndBack(t *testing.T) {
-	// convert entry to value and back
-	now := time.Now()
-	entry := &Entry{
+func newTestEntry() *Entry {
+	return &Entry{
 		Address:      "entry1",
-		LastModified: timestamppb.New(now),
+		LastModified: timestamppb.New(time.Now()),
 		Size:         99,
 		ETag:         "123456789",
 		Metadata:     map[string]string{"key9": "value9", "key1": "value1"},
 	}
+}
+
+func TestEntryToValue(t *testing.T) {
+	// convert entry to value and back
+	entry := newTestEntry()
 	val, err := EntryToValue(entry)
 	if err != nil {
 		t.Fatal("convert entry value", err)

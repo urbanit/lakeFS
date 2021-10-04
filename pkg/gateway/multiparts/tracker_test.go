@@ -22,7 +22,7 @@ func TestTracker_Get(t *testing.T) {
 
 	creationTime := time.Now().Round(time.Second) // round in order to remove the monotonic clock
 	// setup test data
-	if err := tracker.Create(ctx, "upload1", "/path1", "/file1", creationTime); err != nil {
+	if err := tracker.Create(ctx, "upload1", "/path1", "/file1", creationTime, nil); err != nil {
 		t.Fatal("create multipart upload for testing", err)
 	}
 
@@ -78,7 +78,7 @@ func TestTracker_Delete(t *testing.T) {
 	c := testTracker(t)
 
 	// setup test data
-	if err := c.Create(ctx, "uploadX", "/pathX", "/fileX", time.Now()); err != nil {
+	if err := c.Create(ctx, "uploadX", "/pathX", "/fileX", time.Now(), nil); err != nil {
 		t.Fatal("create multipart upload for testing", err)
 	}
 
@@ -108,7 +108,10 @@ func TestTracker_Create(t *testing.T) {
 	tracker := testTracker(t)
 
 	// setup test data
-	if err := tracker.Create(ctx, "uploadX", "/pathX", "/fileX", time.Now()); err != nil {
+	metadata := map[string]string{
+		"content-type": "example/data",
+	}
+	if err := tracker.Create(ctx, "uploadX", "/pathX", "/fileX", time.Now(), metadata); err != nil {
 		t.Fatal("create multipart upload for testing", err)
 	}
 
@@ -151,7 +154,7 @@ func TestTracker_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := tracker.Create(ctx, tt.args.uploadID, tt.args.path, tt.args.physicalAddress, tt.args.creationTime)
+			err := tracker.Create(ctx, tt.args.uploadID, tt.args.path, tt.args.physicalAddress, tt.args.creationTime, nil)
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("Create() error = %v, wantErr %v", err, tt.wantErr)
 			}

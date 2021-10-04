@@ -624,7 +624,7 @@ func (c *Catalog) GetEntry(ctx context.Context, repository string, reference str
 	return &catalogEntry, nil
 }
 
-func EntryFromCatalogEntry(entry DBEntry) *Entry {
+func newEntryFromCatalogEntry(entry DBEntry) *Entry {
 	return &Entry{
 		Address:      entry.PhysicalAddress,
 		AddressType:  addressTypeToProto(entry.AddressType),
@@ -664,7 +664,7 @@ func addressTypeToCatalog(t Entry_AddressType) AddressType {
 func (c *Catalog) CreateEntry(ctx context.Context, repository string, branch string, entry DBEntry, writeConditions ...graveler.WriteConditionOption) error {
 	repositoryID := graveler.RepositoryID(repository)
 	branchID := graveler.BranchID(branch)
-	ent := EntryFromCatalogEntry(entry)
+	ent := newEntryFromCatalogEntry(entry)
 	path := Path(entry.Path)
 	if err := Validate([]ValidateArg{
 		{"repositoryID", repositoryID, ValidateRepositoryID},
@@ -679,15 +679,6 @@ func (c *Catalog) CreateEntry(ctx context.Context, repository string, branch str
 		return err
 	}
 	return c.Store.Set(ctx, repositoryID, branchID, key, *value, writeConditions...)
-}
-
-func (c *Catalog) CreateEntries(ctx context.Context, repository string, branch string, entries []DBEntry) error {
-	for _, entry := range entries {
-		if err := c.CreateEntry(ctx, repository, branch, entry); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (c *Catalog) DeleteEntry(ctx context.Context, repository string, branch string, path string) error {
@@ -1246,7 +1237,6 @@ func newCatalogEntryFromEntry(commonPrefix bool, path string, ent *Entry) DBEntr
 		catEnt.Checksum = ent.ETag
 		catEnt.Metadata = ent.Metadata
 		catEnt.Expired = false
-		catEnt.AddressType = addressTypeToCatalog(ent.AddressType)
 	}
 	return catEnt
 }

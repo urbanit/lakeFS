@@ -96,9 +96,7 @@ func (controller *GetObject) Handle(w http.ResponseWriter, req *http.Request, o 
 		_ = data.Close()
 	}()
 	o.SetHeader(w, "Content-Length", fmt.Sprintf("%d", expected))
-	// Delete the default content-type header so http.Server will detect it from contents
-	// TODO(ariels): After/if we add content-type support to adapter, use *that*.
-	o.DeleteHeader(w, "Content-Type")
+	o.SetMetadataHeaders(w, entry.Metadata)
 	_, err = io.Copy(w, data)
 	if err != nil {
 		o.Log(req).WithError(err).Error("could not write response body for object")

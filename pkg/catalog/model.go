@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/treeverse/lakefs/pkg/block"
@@ -12,6 +13,9 @@ import (
 const (
 	DBEntryFieldChecksum        = "checksum"
 	DBEntryFieldPhysicalAddress = "physical_address"
+
+	ContentTypeKey     = "content-type"
+	DefaultContentType = "application/octet-stream"
 )
 
 type Metadata map[string]string
@@ -60,7 +64,7 @@ type Tag struct {
 	CommitID string
 }
 
-// AddressType is the type of an entry address
+// AddressType is the type of entry address
 type AddressType int32
 
 const (
@@ -91,14 +95,14 @@ func (at AddressType) ToIdentifierType() block.IdentifierType {
 	}
 }
 
-func (j Metadata) Value() (driver.Value, error) {
-	if j == nil {
+func (m Metadata) Value() (driver.Value, error) {
+	if m == nil {
 		return json.Marshal(struct{}{})
 	}
-	return json.Marshal(j)
+	return json.Marshal(m)
 }
 
-func (j *Metadata) Scan(src interface{}) error {
+func (m *Metadata) Scan(src interface{}) error {
 	if src == nil {
 		return nil
 	}
@@ -106,5 +110,36 @@ func (j *Metadata) Scan(src interface{}) error {
 	if !ok {
 		return ErrInvalidMetadataSrcFormat
 	}
-	return json.Unmarshal(data, j)
+	return json.Unmarshal(data, m)
+}
+
+func (m Metadata) Set(key, value string) {
+	k := strings.ToLower(key)
+	// make sure content-type holds default value
+	if k == ContentTypeKey && value == "" {
+		value = DefaultContentType
+	}
+	m[k] = value
+}
+
+func (m Metadata) Get(key string) string {
+	k := strings.ToLower(key)
+	value := m[key]
+	// make sure we always return default for content-type
+	if k == ContentTypeKey && value == "" {
+		return DefaultContentType
+	}
+	return value
+}
+
+func NewMetadataFromMap(m map[string]string) Metadata {
+	meta := make(Metadata)
+	for k, v := range m {
+		meta[strings.ToLower(k)] = v
+	}
+	// set default if missing - default type
+	if meta[ContentTypeKey] == "" {
+		meta[ContentTypeKey] = DefaultContentType
+	}
+	return meta
 }

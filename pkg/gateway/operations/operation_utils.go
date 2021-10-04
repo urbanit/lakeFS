@@ -8,7 +8,7 @@ import (
 	"github.com/treeverse/lakefs/pkg/logging"
 )
 
-func (o *PathOperation) finishUpload(req *http.Request, checksum, physicalAddress string, size int64, relative bool) error {
+func (o *PathOperation) finishUpload(req *http.Request, checksum, physicalAddress string, size int64, relative bool, metadata map[string]string) error {
 	addressType := catalog.AddressTypeRelative
 	if !relative {
 		addressType = catalog.AddressTypeFull
@@ -21,7 +21,7 @@ func (o *PathOperation) finishUpload(req *http.Request, checksum, physicalAddres
 		PhysicalAddress: physicalAddress,
 		AddressType:     addressType,
 		Checksum:        checksum,
-		Metadata:        nil, // TODO: Read whatever metadata came from the request headers/params and add here
+		Metadata:        metadata,
 		Size:            size,
 		CreationDate:    writeTime,
 	}

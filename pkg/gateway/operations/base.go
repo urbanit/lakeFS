@@ -116,6 +116,21 @@ func (o *Operation) SetHeader(w http.ResponseWriter, key, value string) {
 	w.Header()[key] = []string{value}
 }
 
+func (o *Operation) SetMetadataHeaders(w http.ResponseWriter, m catalog.Metadata) {
+	contentType := m[catalog.ContentTypeKey]
+	if contentType == "" {
+		o.DeleteHeader(w, "Content-Type")
+	} else {
+		o.SetHeader(w, "Content-Type", contentType)
+	}
+}
+
+func (o *Operation) GetMetadataHeaders(r *http.Request) catalog.Metadata {
+	m := make(catalog.Metadata)
+	m.Set(catalog.ContentTypeKey, r.Header.Get("Content-Type"))
+	return m
+}
+
 // DeleteHeader deletes a header from the response
 func (o *Operation) DeleteHeader(w http.ResponseWriter, key string) {
 	w.Header().Del(key)

@@ -14,6 +14,7 @@ type Blob struct {
 	RelativePath    bool
 	Checksum        string
 	Size            int64
+	Metadata        map[string]string
 }
 
 func WriteBlob(ctx context.Context, adapter block.Adapter, bucketName string, body io.Reader, contentLength int64, opts block.PutOpts) (*Blob, error) {
@@ -34,5 +35,6 @@ func WriteBlob(ctx context.Context, adapter block.Adapter, bucketName string, bo
 		RelativePath:    true,
 		Checksum:        checksum,
 		Size:            hashReader.CopiedSize,
+		Metadata:        opts.Metadata,
 	}, nil
 }

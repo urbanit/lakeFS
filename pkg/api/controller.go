@@ -213,10 +213,11 @@ func (c *Controller) LinkPhysicalAddress(w http.ResponseWriter, r *http.Request,
 	// Because CreateEntry tracks staging on a database with atomic operations,
 	// _ignore_ the staging token here: no harm done even if a race was lost
 	// against a commit.
-	var metadata catalog.Metadata
+	var additionalProperties map[string]string
 	if body.UserMetadata != nil {
-		metadata = body.UserMetadata.AdditionalProperties
+		additionalProperties = body.UserMetadata.AdditionalProperties
 	}
+	metadata := catalog.NewMetadataFromMap(additionalProperties)
 	entry := catalog.DBEntry{
 		CommonLevel:     false,
 		Path:            params.Path,
@@ -1738,7 +1739,13 @@ func (c *Controller) UploadObject(w http.ResponseWriter, r *http.Request, reposi
 		return
 	}
 	defer func() { _ = file.Close() }()
-	blob, err := upload.WriteBlob(ctx, c.BlockAdapter, repo.StorageNamespace, file, handler.Size, block.PutOpts{StorageClass: params.StorageClass})
+
+	metadata := make(catalog.Metadata)
+	metadata.Set(catalog.ContentTypeKey, r.Header.Get("Content-Type"))
+	blob, err := upload.WriteBlob(ctx, c.BlockAdapter, repo.StorageNamespace, file, handler.Size, block.PutOpts{
+		StorageClass: params.StorageClass,
+		Metadata:     metadata,
+	})
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err)
 		return
@@ -1758,6 +1765,7 @@ func (c *Controller) UploadObject(w http.ResponseWriter, r *http.Request, reposi
 		CreationDate:    writeTime,
 		Size:            blob.Size,
 		Checksum:        blob.Checksum,
+		Metadata:        blob.Metadata,
 	}
 
 	err = c.Catalog.CreateEntry(ctx, repo.Name, branch, entry, graveler.IfAbsent(!allowOverwrite))
@@ -1787,6 +1795,9 @@ func (c *Controller) UploadObject(w http.ResponseWriter, r *http.Request, reposi
 		PathType:        entryTypeObject,
 		PhysicalAddress: qk.Format(),
 		SizeBytes:       Int64Ptr(blob.Size),
+		Metadata: &ObjectUserMetadata{
+			AdditionalProperties: metadata,
+		},
 	}
 	writeResponse(w, http.StatusCreated, response)
 }
@@ -1828,7 +1839,11 @@ func (c *Controller) StageObject(w http.ResponseWriter, r *http.Request, body St
 	if body.Mtime != nil {
 		writeTime = time.Unix(*body.Mtime, 0)
 	}
-
+	// metadata
+	var additionalProperties map[string]string
+	if body.Metadata != nil {
+		additionalProperties = body.Metadata.AdditionalProperties
+	}
 	entry := catalog.DBEntry{
 		CommonLevel:     false,
 		Path:            params.Path,
@@ -1837,11 +1852,8 @@ func (c *Controller) StageObject(w http.ResponseWriter, r *http.Request, body St
 		CreationDate:    writeTime,
 		Size:            body.SizeBytes,
 		Checksum:        body.Checksum,
+		Metadata:        catalog.NewMetadataFromMap(additionalProperties),
 	}
-	if body.Metadata != nil {
-		entry.Metadata = body.Metadata.AdditionalProperties
-	}
-
 	err = c.Catalog.CreateEntry(ctx, repo.Name, branch, entry)
 	if handleAPIError(w, err) {
 		return
