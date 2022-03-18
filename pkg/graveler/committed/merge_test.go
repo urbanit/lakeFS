@@ -41,6 +41,7 @@ func newRecordMatcher(key string, identity string) recordMatcher {
 		identity: []byte(identity),
 	}
 }
+
 func (m recordMatcher) Matches(x interface{}) bool {
 	record := x.(graveler.ValueRecord)
 	return bytes.Equal(m.key, record.Key) && bytes.Equal(m.identity, record.Identity)
@@ -255,31 +256,33 @@ func Test_merge(t *testing.T) {
 					{"k3", "base:k3"},
 				}},
 			},
-			expectedResult: []testRunResult{{
-				mergeStrategies:     []graveler.MergeStrategy{graveler.MergeStrategyNone, graveler.MergeStrategyDest, graveler.MergeStrategySource},
-				conflictExpectedIdx: nil,
-				expectedActions: []writeAction{
-					{
-						action:   actionTypeWriteRecord,
-						key:      "k1",
-						identity: "base:k1",
+			expectedResult: []testRunResult{
+				{
+					mergeStrategies:     []graveler.MergeStrategy{graveler.MergeStrategyNone, graveler.MergeStrategyDest, graveler.MergeStrategySource},
+					conflictExpectedIdx: nil,
+					expectedActions: []writeAction{
+						{
+							action:   actionTypeWriteRecord,
+							key:      "k1",
+							identity: "base:k1",
+						},
+						{
+							action:   actionTypeWriteRecord,
+							key:      "k3",
+							identity: "base:k3",
+						},
+						{
+							action:   actionTypeWriteRecord,
+							key:      "k4",
+							identity: "source:k4",
+						},
+						{
+							action:   actionTypeWriteRecord,
+							key:      "k5",
+							identity: "source:k5",
+						},
 					},
-					{
-						action:   actionTypeWriteRecord,
-						key:      "k3",
-						identity: "base:k3",
-					},
-					{
-						action:   actionTypeWriteRecord,
-						key:      "k4",
-						identity: "source:k4",
-					},
-					{
-						action:   actionTypeWriteRecord,
-						key:      "k5",
-						identity: "source:k5",
-					},
-				}},
+				},
 			},
 		},
 		"source range append and remove after": {
@@ -287,9 +290,12 @@ func Test_merge(t *testing.T) {
 				{rng: committed.Range{ID: "base:k1-k3", MinKey: committed.Key("k1"), MaxKey: committed.Key("k3")}, records: []testValueRecord{
 					{"k1", "base:k1"}, {"k3", "base:k3"},
 				}},
-				{rng: committed.Range{ID: "base:k4-k6", MinKey: committed.Key("k4"), MaxKey: committed.Key("k6")}, records: []testValueRecord{
-					{"k4", "base:k4"}, {"k6", "base:k6"}},
-				}},
+				{
+					rng: committed.Range{ID: "base:k4-k6", MinKey: committed.Key("k4"), MaxKey: committed.Key("k6")}, records: []testValueRecord{
+						{"k4", "base:k4"}, {"k6", "base:k6"},
+					},
+				},
+			},
 			sourceRange: []testRange{
 				{rng: committed.Range{ID: "source:k1-k5", MinKey: committed.Key("k1"), MaxKey: committed.Key("k5")}, records: []testValueRecord{
 					{"k1", "base:k1"}, {"k2", "source:k2"}, {"k3", "base:k3"}, {"k4", "base:k4"}, {"k5", "source:k5"},
@@ -299,9 +305,12 @@ func Test_merge(t *testing.T) {
 				{rng: committed.Range{ID: "base:k1-k3", MinKey: committed.Key("k1"), MaxKey: committed.Key("k3")}, records: []testValueRecord{
 					{"k1", "base:k1"}, {"k3", "base:k3"},
 				}},
-				{rng: committed.Range{ID: "base:k4-k6", MinKey: committed.Key("k4"), MaxKey: committed.Key("k6")}, records: []testValueRecord{
-					{"k4", "base:k4"}, {"k6", "base:k6"}},
-				}},
+				{
+					rng: committed.Range{ID: "base:k4-k6", MinKey: committed.Key("k4"), MaxKey: committed.Key("k6")}, records: []testValueRecord{
+						{"k4", "base:k4"}, {"k6", "base:k6"},
+					},
+				},
+			},
 			expectedResult: []testRunResult{{
 				mergeStrategies:     []graveler.MergeStrategy{graveler.MergeStrategyNone, graveler.MergeStrategyDest, graveler.MergeStrategySource},
 				conflictExpectedIdx: nil,
@@ -524,7 +533,8 @@ func Test_merge(t *testing.T) {
 		"source key removed from range - same bounds": {
 			baseRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"}, {"k5", "base:k5"}, {"k6", "base:k6"},
 					},
@@ -532,7 +542,8 @@ func Test_merge(t *testing.T) {
 			},
 			sourceRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "source:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "source:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k6", "base:k6"},
 					},
@@ -540,7 +551,8 @@ func Test_merge(t *testing.T) {
 			},
 			destRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"}, {"k5", "base:k5"}, {"k6", "base:k6"},
 					},
@@ -558,7 +570,8 @@ func Test_merge(t *testing.T) {
 		"source key removed from range": {
 			baseRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"}, {"k5", "base:k5"}, {"k6", "base:k6"},
 					},
@@ -566,7 +579,8 @@ func Test_merge(t *testing.T) {
 			},
 			sourceRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "source:k3-k5", MinKey: committed.Key("k3"), MaxKey: committed.Key("k5"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "source:k3-k5", MinKey: committed.Key("k3"), MaxKey: committed.Key("k5"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k5", "base:k5"},
 					},
@@ -574,7 +588,8 @@ func Test_merge(t *testing.T) {
 			},
 			destRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"}, {"k5", "base:k5"}, {"k6", "base:k6"},
 					},
@@ -593,7 +608,8 @@ func Test_merge(t *testing.T) {
 		"dest key removed from range": {
 			baseRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"}, {"k5", "base:k5"}, {"k6", "base:k6"},
 					},
@@ -601,7 +617,8 @@ func Test_merge(t *testing.T) {
 			},
 			sourceRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 4, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"}, {"k5", "base:k5"}, {"k6", "base:k6"},
 					},
@@ -609,7 +626,8 @@ func Test_merge(t *testing.T) {
 			},
 			destRange: []testRange{
 				{rng: committed.Range{ID: "base:k1-k2", MinKey: committed.Key("k1"), MaxKey: committed.Key("k2"), Count: 2, EstimatedSize: 1234}},
-				{rng: committed.Range{ID: "dest:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "dest:k3-k6", MinKey: committed.Key("k3"), MaxKey: committed.Key("k6"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k6", "base:k6"},
 					},
@@ -650,22 +668,28 @@ func Test_merge(t *testing.T) {
 		},
 		"dest removed range and added range after source removed range edges": {
 			baseRange: []testRange{
-				{rng: committed.Range{ID: "base:k1-k5", MinKey: committed.Key("k1"), MaxKey: committed.Key("k5"), Count: 5, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k1-k5", MinKey: committed.Key("k1"), MaxKey: committed.Key("k5"), Count: 5, EstimatedSize: 1234},
 					records: []testValueRecord{
-						{"k1", "base:k1"}, {"k2", "base:k2"}, {"k3", "base:k3"}, {"k4", "base:k4"},
+						{"k1", "base:k1"},
+						{"k2", "base:k2"},
+						{"k3", "base:k3"},
+						{"k4", "base:k4"},
 						{"k5", "base:k5"},
 					},
 				},
 			},
 			sourceRange: []testRange{
-				{rng: committed.Range{ID: "source:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "source:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"},
 					},
 				},
 			},
 			destRange: []testRange{
-				{rng: committed.Range{ID: "dest:k6-k7", MinKey: committed.Key("k6"), MaxKey: committed.Key("k7"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "dest:k6-k7", MinKey: committed.Key("k6"), MaxKey: committed.Key("k7"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k6", "dest:k6"}, {"k7", "dest:k7"},
 					},
@@ -683,21 +707,24 @@ func Test_merge(t *testing.T) {
 		},
 		"no changes": {
 			baseRange: []testRange{
-				{rng: committed.Range{ID: "base:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"},
 					},
 				},
 			},
 			sourceRange: []testRange{
-				{rng: committed.Range{ID: "base:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"},
 					},
 				},
 			},
 			destRange: []testRange{
-				{rng: committed.Range{ID: "base:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "base:k4"},
 					},
@@ -1196,22 +1223,28 @@ func TestMergeStrategies(t *testing.T) {
 		//   written on both 'dest-wins' and 'source-wins' strategies
 		"source and dest change same range conflict": {
 			baseRange: []testRange{
-				{rng: committed.Range{ID: "base:k1-k5", MinKey: committed.Key("k1"), MaxKey: committed.Key("k5"), Count: 5, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "base:k1-k5", MinKey: committed.Key("k1"), MaxKey: committed.Key("k5"), Count: 5, EstimatedSize: 1234},
 					records: []testValueRecord{
-						{"k1", "base:k1"}, {"k2", "base:k2"}, {"k3", "base:k3"}, {"k4", "base:k4"},
+						{"k1", "base:k1"},
+						{"k2", "base:k2"},
+						{"k3", "base:k3"},
+						{"k4", "base:k4"},
 						{"k5", "base:k5"},
 					},
 				},
 			},
 			sourceRange: []testRange{
-				{rng: committed.Range{ID: "source:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "source:k3-k4", MinKey: committed.Key("k3"), MaxKey: committed.Key("k4"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k3", "base:k3"}, {"k4", "source:k4"},
 					},
 				},
 			},
 			destRange: []testRange{
-				{rng: committed.Range{ID: "dest:k6-k7", MinKey: committed.Key("k6"), MaxKey: committed.Key("k7"), Count: 2, EstimatedSize: 1234},
+				{
+					rng: committed.Range{ID: "dest:k6-k7", MinKey: committed.Key("k6"), MaxKey: committed.Key("k7"), Count: 2, EstimatedSize: 1234},
 					records: []testValueRecord{
 						{"k6", "dest:k6"}, {"k7", "dest:k7"},
 					},

@@ -15,7 +15,8 @@ func (controller *ListBuckets) RequiredPermissions(_ *http.Request) (permissions
 	return permissions.Node{
 		Permission: permissions.Permission{
 			Action:   permissions.ListRepositoriesAction,
-			Resource: "*"},
+			Resource: "*",
+		},
 	}, nil
 }
 

@@ -556,7 +556,6 @@ func (s *DBAuthService) ListUserGroups(ctx context.Context, username string, par
 		p.Amount = len(groups)
 		return &res{groups, p}, nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
@@ -598,7 +597,6 @@ func (s *DBAuthService) ListGroupUsers(ctx context.Context, groupDisplayName str
 		p.Amount = len(users)
 		return &res{users, p}, nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
@@ -681,7 +679,6 @@ func (s *DBAuthService) ListPolicies(ctx context.Context, params *model.Paginati
 		p.Amount = len(policies)
 		return &res{policies, p}, nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
@@ -920,7 +917,6 @@ func (s *DBAuthService) Authorize(ctx context.Context, req *AuthorizationRequest
 		After:  "", // all
 		Amount: -1, // all
 	})
-
 	if err != nil {
 		return nil, err
 	}

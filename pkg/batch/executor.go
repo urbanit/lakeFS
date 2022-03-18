@@ -32,8 +32,7 @@ type Batcher interface {
 	BatchFor(key string, dur time.Duration, exec Executer) (interface{}, error)
 }
 
-type nonBatchingExecutor struct {
-}
+type nonBatchingExecutor struct{}
 
 func (n *nonBatchingExecutor) BatchFor(_ string, _ time.Duration, exec Executer) (interface{}, error) {
 	return exec.Execute()

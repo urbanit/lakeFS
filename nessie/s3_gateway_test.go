@@ -143,10 +143,12 @@ func TestS3CopyObject(t *testing.T) {
 	_, err = minioClient.CopyObject(ctx,
 		minio.CopyDestOptions{
 			Bucket: repo,
-			Object: DestPath},
+			Object: DestPath,
+		},
 		minio.CopySrcOptions{
 			Bucket: repo,
-			Object: SourcePath})
+			Object: SourcePath,
+		})
 
 	if err != nil {
 		t.Errorf("minio.Client.CopyObjectFrom(%s)To(%s): %s", SourcePath, DestPath, err)
@@ -192,10 +194,12 @@ func TestS3CopyObject(t *testing.T) {
 	_, err = minioClient.CopyObject(ctx,
 		minio.CopyDestOptions{
 			Bucket: destRepo,
-			Object: DestPath},
+			Object: DestPath,
+		},
 		minio.CopySrcOptions{
 			Bucket: repo,
-			Object: SourcePath})
+			Object: SourcePath,
+		})
 
 	if err != nil {
 		t.Errorf("minio.Client.CopyObjectFrom(%s)To(%s): %s", SourcePath, DestPath, err)

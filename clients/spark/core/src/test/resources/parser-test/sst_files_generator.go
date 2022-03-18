@@ -256,7 +256,8 @@ func prepareSortedSlice(size int, genKey func() (string, error)) []string {
 // create sst and json files that will be used to unit test the sst block parser (clients/spark/core/src/main/scala/io/treeverse/jpebble/BlockParser.scala)
 // The sst file is the test input, and the json file encapsulates the expected parser output.
 func createTestInputFiles(keys []string, genValue func() (string, error), size int, name string,
-	writerOptions sstable.WriterOptions) {
+	writerOptions sstable.WriterOptions,
+) {
 	fmt.Printf("Generate %s of size %d bytes\n", name, size)
 	sstFileName := name + ".sst"
 	sstFile, err := os.Create(sstFileName)

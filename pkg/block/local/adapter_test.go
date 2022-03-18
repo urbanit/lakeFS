@@ -21,7 +21,7 @@ func makeAdapter(t *testing.T) *local.Adapter {
 	t.Helper()
 	dir, err := os.MkdirTemp("", "testing-local-adapter-*")
 	testutil.MustDo(t, "TempDir", err)
-	testutil.MustDo(t, "NewAdapter", os.MkdirAll(dir, 0700))
+	testutil.MustDo(t, "NewAdapter", os.MkdirAll(dir, 0o700))
 	a, err := local.NewAdapter(dir)
 	testutil.MustDo(t, "NewAdapter", err)
 

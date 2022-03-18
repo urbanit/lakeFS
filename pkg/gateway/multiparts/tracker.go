@@ -103,6 +103,7 @@ func (m Metadata) Set(k, v string) {
 func (m Metadata) Get(k string) string {
 	return m[strings.ToLower(k)]
 }
+
 func (m Metadata) Value() (driver.Value, error) {
 	return json.Marshal(m)
 }

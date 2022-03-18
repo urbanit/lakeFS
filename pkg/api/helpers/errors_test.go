@@ -1,11 +1,11 @@
 package helpers_test
 
 import (
-	"github.com/treeverse/lakefs/pkg/api/helpers"
-
 	"fmt"
 	"net/http"
 	"testing"
+
+	"github.com/treeverse/lakefs/pkg/api/helpers"
 )
 
 type Response struct {

@@ -95,13 +95,14 @@ func (w *ResponseWriter) Header() http.Header {
 	}
 	return h
 }
+
 func (w *ResponseWriter) SaveHeaders(fName string) {
 	logger := logging.Default()
 	if len(w.Headers) == 0 {
 		return
 	}
 	s, _ := json.Marshal(w.Headers)
-	err := os.WriteFile(fName, s, 0600)
+	err := os.WriteFile(fName, s, 0o600)
 	if err != nil {
 		logger.WithError(err).Fatal("failed crete file " + fName)
 	}

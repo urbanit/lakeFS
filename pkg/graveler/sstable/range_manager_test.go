@@ -22,8 +22,7 @@ func makeNewReader(r fakeReader) func(context.Context, committed.Namespace, comm
 	}
 }
 
-type NoCache struct {
-}
+type NoCache struct{}
 
 func (n *NoCache) Unref() {}
 

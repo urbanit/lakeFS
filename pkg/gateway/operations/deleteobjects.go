@@ -48,7 +48,8 @@ func (controller *DeleteObjects) Handle(w http.ResponseWriter, req *http.Request
 				Permission: permissions.Permission{
 					Action:   permissions.DeleteObjectAction,
 					Resource: permissions.ObjectArn(o.Repository.Name, resolvedPath.Path),
-				}},
+				},
+			},
 		})
 		if err != nil || !authResp.Allowed {
 			errs = append(errs, serde.DeleteError{

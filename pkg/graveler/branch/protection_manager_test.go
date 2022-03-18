@@ -126,7 +126,6 @@ func TestIsBlocked(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func prepareTest(t *testing.T, ctx context.Context) *branch.ProtectionManager {

@@ -30,5 +30,4 @@ func TestDoctor(t *testing.T) {
 	RunCmdAndVerifySuccessWithFile(t, LakectlWithParams("AKIAJOI!COZ5JBYHCSDQ", secretAccessKey, endPointURL)+" doctor --verbose", false, "lakectl_doctor_with_suspicious_access_key_id_verbose", emptyVars)
 	RunCmdAndVerifySuccessWithFile(t, LakectlWithParams(accessKeyID, "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz", endPointURL)+" doctor --verbose", false, "lakectl_doctor_with_wrong_credentials_verbose", emptyVars)
 	RunCmdAndVerifySuccessWithFile(t, LakectlWithParams(accessKeyID, "TQG5JcovOozCGJnIRmIKH7Flq1tLxnuByi9/WmJ!", endPointURL)+" doctor --verbose", false, "lakectl_doctor_with_suspicious_secret_access_key_verbose", emptyVars)
-
 }

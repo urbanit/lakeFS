@@ -151,7 +151,7 @@ func columnsLocalToGlue(columns []*metastore.FieldSchema) []*glue.Column {
 		res[i] = &glue.Column{
 			Comment: aws.String(column.Comment),
 			Name:    aws.String(column.Name),
-			//Parameters: nil,
+			// Parameters: nil,
 			Type: aws.String(column.Type),
 		}
 	}
@@ -160,7 +160,7 @@ func columnsLocalToGlue(columns []*metastore.FieldSchema) []*glue.Column {
 
 func DatabaseLocalToGlue(db *metastore.Database) *glue.DatabaseInput {
 	return &glue.DatabaseInput{
-		//CreateTableDefaultPermissions: db.,
+		// CreateTableDefaultPermissions: db.,
 		Description:    aws.String(db.Description),
 		LocationUri:    aws.String(db.LocationURI),
 		Name:           aws.String(db.Name),
@@ -210,7 +210,7 @@ func TableLocalToGlue(table *metastore.Table) *glue.TableInput {
 func PartitionLocalToGlue(partition *metastore.Partition) *glue.PartitionInput {
 	sd := SDLocalToGlue(partition.Sd)
 	ht := &glue.PartitionInput{
-		//IsRegisteredWithLakeFormation: partition.AWSIsRegisteredWithLakeFormation,
+		// IsRegisteredWithLakeFormation: partition.AWSIsRegisteredWithLakeFormation,
 		LastAccessTime:    localToAWSTime(int64(partition.LastAccessTime)), // TODO(Guys): check if this OK
 		LastAnalyzedTime:  partition.AWSLastAnalyzedTime,
 		Parameters:        aws.StringMap(partition.Parameters),

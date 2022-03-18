@@ -256,7 +256,6 @@ func TestManager_SetBranch(t *testing.T) {
 	if b.CommitID != "c3" {
 		t.Fatalf("unexpected commit for branch2: %s - expected: c3", b.CommitID)
 	}
-
 }
 
 func TestManager_DeleteBranch(t *testing.T) {
@@ -688,7 +687,8 @@ func TestManager_GetCommitByPrefix(t *testing.T) {
 	}, "")
 	testutil.MustDo(t, "Create repository", err)
 	for _, commitID := range commitIDs {
-		c := graveler.Commit{Committer: "user1",
+		c := graveler.Commit{
+			Committer:    "user1",
 			Message:      fmt.Sprintf("id_%s", commitID),
 			MetaRangeID:  "deadbeef123",
 			CreationDate: time.Now(),

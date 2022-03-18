@@ -148,7 +148,8 @@ func EnrichWithRepositoryOrFallback(c catalog.Interface, authService simulator.G
 			authResp, authErr := authService.Authorize(ctx, &auth.AuthorizationRequest{
 				Username: username,
 				RequiredPermissions: permissions.Node{
-					Permission: permissions.Permission{Action: permissions.ListRepositoriesAction, Resource: "*"}},
+					Permission: permissions.Permission{Action: permissions.ListRepositoriesAction, Resource: "*"},
+				},
 			})
 			if authErr != nil || authResp.Error != nil || !authResp.Allowed {
 				_ = o.EncodeError(w, req, gatewayerrors.ErrAccessDenied.ToAPIErr())

@@ -28,6 +28,7 @@ func (d *UploadIDTranslator) TranslateUploadID(simulationID string) string {
 		return id
 	}
 }
+
 func (d *UploadIDTranslator) RemoveUploadID(inputUploadID string) {
 	var keyToRemove string
 	d.mux.Lock()

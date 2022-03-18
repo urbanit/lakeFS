@@ -22,7 +22,8 @@ func (controller *GetObject) RequiredPermissions(_ *http.Request, repoID, _, pat
 	return permissions.Node{
 		Permission: permissions.Permission{
 			Action:   permissions.ReadObjectAction,
-			Resource: permissions.ObjectArn(repoID, path)},
+			Resource: permissions.ObjectArn(repoID, path),
+		},
 	}, nil
 }
 

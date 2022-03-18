@@ -8,9 +8,7 @@ import (
 	"time"
 )
 
-var (
-	ErrNoStorageAdapter = errors.New("no storage adapter found")
-)
+var ErrNoStorageAdapter = errors.New("no storage adapter found")
 
 type ObjectStoreEntry struct {
 	// FullKey represents the fully qualified path in the object store namespace for the given entry

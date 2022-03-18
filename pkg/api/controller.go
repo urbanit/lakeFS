@@ -1165,14 +1165,17 @@ func (c *Controller) CreateRepository(w http.ResponseWriter, r *http.Request, bo
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.CreateRepositoryAction,
-					Resource: permissions.RepoArn(body.Name)},
+					Resource: permissions.RepoArn(body.Name),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.AttachStorageNamespace,
-					Resource: permissions.StorageNamespace(body.StorageNamespace)},
+					Resource: permissions.StorageNamespace(body.StorageNamespace),
+				},
 			},
-		}}) {
+		},
+	}) {
 		return
 	}
 	ctx := r.Context()
@@ -2167,14 +2170,17 @@ func (c *Controller) GetMetaRange(w http.ResponseWriter, r *http.Request, reposi
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ListObjectsAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ReadRepositoryAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
-		}}) {
+		},
+	}) {
 		return
 	}
 	ctx := r.Context()
@@ -2199,14 +2205,17 @@ func (c *Controller) GetRange(w http.ResponseWriter, r *http.Request, repository
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ListObjectsAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ReadRepositoryAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
-		}}) {
+		},
+	}) {
 		return
 	}
 	ctx := r.Context()
@@ -2230,19 +2239,23 @@ func (c *Controller) DumpRefs(w http.ResponseWriter, r *http.Request, repository
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ListTagsAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ListBranchesAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ListCommitsAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
-		}}) {
+		},
+	}) {
 		return
 	}
 	ctx := r.Context()
@@ -2298,19 +2311,23 @@ func (c *Controller) RestoreRefs(w http.ResponseWriter, r *http.Request, body Re
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.CreateTagAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.CreateBranchAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.CreateCommitAction,
-					Resource: permissions.RepoArn(repository)},
+					Resource: permissions.RepoArn(repository),
+				},
 			},
-		}}) {
+		},
+	}) {
 		return
 	}
 	ctx := r.Context()

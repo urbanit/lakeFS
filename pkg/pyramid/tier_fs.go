@@ -351,7 +351,6 @@ func (tfs *TierFS) openWithLock(ctx context.Context, fileRef localFileRef) (*os.
 
 		return nil, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

@@ -49,7 +49,7 @@ func WithRemoveEmptyDir(b bool) func(a *Adapter) {
 func NewAdapter(path string, opts ...func(a *Adapter)) (*Adapter, error) {
 	// Clean() the path so that misconfiguration does not allow path traversal.
 	path = filepath.Clean(path)
-	err := os.MkdirAll(path, 0700)
+	err := os.MkdirAll(path, 0o700)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (l *Adapter) maybeMkdir(path string, f func(p string) (*os.File, error)) (*
 		return ret, err
 	}
 	d := filepath.Dir(filepath.Clean(path))
-	if err = os.MkdirAll(d, 0750); err != nil {
+	if err = os.MkdirAll(d, 0o750); err != nil {
 		return nil, err
 	}
 	return f(path)
@@ -245,7 +245,7 @@ func (l *Adapter) Get(_ context.Context, obj block.ObjectPointer, _ int64) (read
 	if err != nil {
 		return nil, err
 	}
-	f, err := os.OpenFile(filepath.Clean(p), os.O_RDONLY, 0600)
+	f, err := os.OpenFile(filepath.Clean(p), os.O_RDONLY, 0o600)
 	if os.IsNotExist(err) {
 		return nil, adapter.ErrDataNotFound
 	}
@@ -336,7 +336,7 @@ func (l *Adapter) CreateMultiPartUpload(_ context.Context, obj block.ObjectPoint
 			return nil, err
 		}
 		fullDir := path.Dir(fullPath)
-		err = os.MkdirAll(fullDir, 0750)
+		err = os.MkdirAll(fullDir, 0o750)
 		if err != nil {
 			return nil, err
 		}
@@ -423,7 +423,7 @@ func (l *Adapter) unitePartFiles(identifier block.ObjectPointer, files []string)
 	defer func() {
 		_ = unitedFile.Close()
 	}()
-	var readers = []io.Reader{}
+	readers := []io.Reader{}
 	for _, name := range files {
 		if err := l.verifyPath(name); err != nil {
 			return 0, err

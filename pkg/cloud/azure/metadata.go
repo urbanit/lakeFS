@@ -13,8 +13,10 @@ import (
 	"github.com/treeverse/lakefs/pkg/logging"
 )
 
-const azureMetadataIP = "169.254.169.254"
-const metadataRequestTimeout = 5 * time.Second
+const (
+	azureMetadataIP        = "169.254.169.254"
+	metadataRequestTimeout = 5 * time.Second
+)
 
 type MetadataProvider struct {
 	logger logging.Logger

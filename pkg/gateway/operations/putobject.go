@@ -37,7 +37,8 @@ func (controller *PutObject) RequiredPermissions(req *http.Request, repoID, _, d
 		return permissions.Node{
 			Permission: permissions.Permission{
 				Action:   permissions.WriteObjectAction,
-				Resource: permissions.ObjectArn(repoID, destPath)},
+				Resource: permissions.ObjectArn(repoID, destPath),
+			},
 		}, nil
 	}
 	// this is a copy operation
@@ -53,13 +54,17 @@ func (controller *PutObject) RequiredPermissions(req *http.Request, repoID, _, d
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.WriteObjectAction,
-					Resource: permissions.ObjectArn(repoID, destPath)},
+					Resource: permissions.ObjectArn(repoID, destPath),
+				},
 			},
 			{
 				Permission: permissions.Permission{
 					Action:   permissions.ReadObjectAction,
-					Resource: permissions.ObjectArn(p.Repo, p.Path)},
-			}}}, nil
+					Resource: permissions.ObjectArn(p.Repo, p.Path),
+				},
+			},
+		},
+	}, nil
 }
 
 // extractEntryFromCopyReq: get metadata from source file

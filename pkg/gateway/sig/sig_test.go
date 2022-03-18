@@ -60,8 +60,10 @@ func TestIsAWSSignedRequest(t *testing.T) {
 	}
 }
 
-type Signer func(req http.Request) *http.Request
-type Verifier func(req *http.Request) error
+type (
+	Signer   func(req http.Request) *http.Request
+	Verifier func(req *http.Request) error
+)
 
 type Style string
 

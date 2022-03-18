@@ -48,7 +48,7 @@ func makePlaybackParams(testDir string) *PlaybackParams {
 }
 
 func DoTestRun(handler http.Handler, timed bool, speed float64, t *testing.T, params *PlaybackParams) {
-	err := os.MkdirAll(params.PlaybackDir, 0755)
+	err := os.MkdirAll(params.PlaybackDir, 0o755)
 	if err != nil {
 		t.Fatal("could not create playback directory:", params.PlaybackDir)
 	}

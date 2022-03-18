@@ -90,6 +90,6 @@ func (d *externalRecordDownloader) DownloadRecording(bucket, key, destination st
 
 	// write the etag file
 	etagFileName := getEtagFileName(destination)
-	err = os.WriteFile(etagFileName, []byte(s3Etag), 0644) //nolint:gosec
+	err = os.WriteFile(etagFileName, []byte(s3Etag), 0o644) //nolint:gosec
 	return err
 }

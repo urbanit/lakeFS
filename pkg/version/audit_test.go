@@ -181,7 +181,8 @@ func TestAuditChecker_Check(t *testing.T) {
 		{name: "none", alerts: []Alert{}},
 		{name: "alerts", alerts: []Alert{
 			{ID: "1", AffectedVersions: ">v1,<v2", PatchedVersions: "v2", Description: "bad1"},
-			{ID: "2", AffectedVersions: ">v1,<v1.0.5||>v2<v2.2.0", PatchedVersions: "v1.0.5,v.2.1.1", Description: "bad2"}}},
+			{ID: "2", AffectedVersions: ">v1,<v1.0.5||>v2<v2.2.0", PatchedVersions: "v1.0.5,v.2.1.1", Description: "bad2"},
+		}},
 		{name: "failed", alerts: []Alert{}, statusCode: http.StatusInternalServerError, wantErr: true},
 	}
 	ctx := context.Background()

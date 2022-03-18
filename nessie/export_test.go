@@ -24,8 +24,8 @@ func NewExternalS3Service() *s3.S3 {
 					Value: credentials.Value{
 						AccessKeyID:     viper.GetString("aws_access_key_id"),
 						SecretAccessKey: viper.GetString("aws_secret_access_key"),
-					}})))
-
+					},
+				})))
 }
 
 func parsePath(t testing.TB, path string) (string, string) {

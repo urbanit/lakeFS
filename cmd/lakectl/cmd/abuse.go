@@ -124,7 +124,7 @@ var abuseRandomWritesCmd = &cobra.Command{
 		repo := resp.JSON200
 		storagePrefix := repo.StorageNamespace
 		var size int64
-		var checksum = "00695c7307b0480c7b6bdc873cf05c15"
+		checksum := "00695c7307b0480c7b6bdc873cf05c15"
 		addr := storagePrefix + "/random-write"
 		creationInfo := api.ObjectStageCreation{
 			Checksum:        checksum,

@@ -30,7 +30,8 @@ func (controller *ListObjects) RequiredPermissions(req *http.Request, repoID str
 		return permissions.Node{
 			Permission: permissions.Permission{
 				Action:   permissions.ListBranchesAction,
-				Resource: permissions.RepoArn(repoID)},
+				Resource: permissions.RepoArn(repoID),
+			},
 		}, nil
 	}
 
@@ -38,7 +39,8 @@ func (controller *ListObjects) RequiredPermissions(req *http.Request, repoID str
 	return permissions.Node{
 		Permission: permissions.Permission{
 			Action:   permissions.ListObjectsAction,
-			Resource: permissions.RepoArn(repoID)},
+			Resource: permissions.RepoArn(repoID),
+		},
 	}, nil
 }
 

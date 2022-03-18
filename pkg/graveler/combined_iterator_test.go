@@ -64,7 +64,8 @@ func TestCombinedIterator_NextValue(t *testing.T) {
 						Identity: []byte("id"),
 						Data:     nil,
 					},
-				}},
+				},
+			},
 		},
 		{
 			name: "only first iterator",
@@ -102,7 +103,8 @@ func TestCombinedIterator_NextValue(t *testing.T) {
 						Identity: []byte("id"),
 						Data:     nil,
 					},
-				}},
+				},
+			},
 		},
 		{
 			name: "only second iterator",
@@ -122,7 +124,8 @@ func TestCombinedIterator_NextValue(t *testing.T) {
 							Identity: []byte("id"),
 							Data:     nil,
 						},
-					}}),
+					},
+				}),
 				p: nil,
 			},
 			wantValue: []*graveler.ValueRecord{
@@ -139,7 +142,8 @@ func TestCombinedIterator_NextValue(t *testing.T) {
 						Identity: []byte("id"),
 						Data:     nil,
 					},
-				}},
+				},
+			},
 		},
 		{
 			name: "one from each",
@@ -178,7 +182,8 @@ func TestCombinedIterator_NextValue(t *testing.T) {
 						Identity: []byte("id"),
 						Data:     nil,
 					},
-				}},
+				},
+			},
 		},
 		{
 			name: "value tombstone",
@@ -214,7 +219,8 @@ func TestCombinedIterator_NextValue(t *testing.T) {
 						Identity: []byte("id"),
 						Data:     nil,
 					},
-				}},
+				},
+			},
 		},
 		{
 			name: "unexpected tombstone",
@@ -316,7 +322,8 @@ func TestCombinedIterator_NextValue(t *testing.T) {
 						Identity: []byte("two"),
 						Data:     nil,
 					},
-				}},
+				},
+			},
 		},
 	}
 	for _, tt := range tests {

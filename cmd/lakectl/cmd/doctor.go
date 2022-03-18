@@ -55,6 +55,7 @@ type UserMessage struct {
 var detailedErrorTemplate = `{{ .Message |red }}
 {{  .Details  }}
 `
+
 var errorTemplate = `{{ .Message |red }}
 `
 

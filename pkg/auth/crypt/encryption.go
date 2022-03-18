@@ -25,9 +25,7 @@ type NaclSecretStore struct {
 	secret []byte
 }
 
-var (
-	ErrFailDecrypt = errors.New("could not decrypt value")
-)
+var ErrFailDecrypt = errors.New("could not decrypt value")
 
 func NewSecretStore(secret []byte) *NaclSecretStore {
 	return &NaclSecretStore{secret: secret}

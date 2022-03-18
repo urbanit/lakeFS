@@ -23,11 +23,10 @@ func lakectlLocation() string {
 }
 
 func LakectlWithParams(accessKeyID, secretAccessKey, endPointURL string) string {
-	lakectlCmdline :=
-		"LAKECTL_CREDENTIALS_ACCESS_KEY_ID=" + accessKeyID +
-			" LAKECTL_CREDENTIALS_SECRET_ACCESS_KEY=" + secretAccessKey +
-			" LAKECTL_SERVER_ENDPOINT_URL=" + endPointURL +
-			" " + lakectlLocation()
+	lakectlCmdline := "LAKECTL_CREDENTIALS_ACCESS_KEY_ID=" + accessKeyID +
+		" LAKECTL_CREDENTIALS_SECRET_ACCESS_KEY=" + secretAccessKey +
+		" LAKECTL_SERVER_ENDPOINT_URL=" + endPointURL +
+		" " + lakectlLocation()
 
 	return lakectlCmdline
 }
@@ -143,7 +142,7 @@ func runCmdAndVerifyWithFile(t *testing.T, cmd string, expectFail bool, isTermin
 		s := sanitize(string(result), vars)
 		s, err := embedVariables(s, vars)
 		require.NoError(t, err, "Variable embed failed - %s", err)
-		err = ioutil.WriteFile(goldenFile, []byte(s), 0600)
+		err = ioutil.WriteFile(goldenFile, []byte(s), 0o600)
 		require.NoError(t, err, "Failed to write file %s", goldenFile)
 		return
 	}

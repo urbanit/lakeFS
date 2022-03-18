@@ -1,12 +1,12 @@
 package config_test
 
 import (
+	"testing"
+
 	"github.com/go-test/deep"
 	"github.com/mitchellh/mapstructure"
 	"github.com/treeverse/lakefs/pkg/config"
 	"github.com/treeverse/lakefs/pkg/testutil"
-
-	"testing"
 )
 
 type StringsStruct struct {

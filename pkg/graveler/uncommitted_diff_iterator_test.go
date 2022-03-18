@@ -120,7 +120,7 @@ func TestNewUncommittedDiffIterator(t *testing.T) {
 				diffRes = append(diffRes, diffIT.Value().Type)
 				KeyRes = append(KeyRes, diffIT.Value().Key.String())
 			}
-			//validate err
+			// validate err
 			if diffIT.Err() != nil {
 				t.Error(diffIT.Err())
 			}

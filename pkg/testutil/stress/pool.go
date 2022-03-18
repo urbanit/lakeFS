@@ -15,8 +15,10 @@ type Result struct {
 
 type WorkFn func(input chan string, output chan Result)
 
-type GeneratorAddFn func(string)
-type GenerateFn func(add GeneratorAddFn)
+type (
+	GeneratorAddFn func(string)
+	GenerateFn     func(add GeneratorAddFn)
+)
 
 type WorkerPool struct {
 	parallelism int

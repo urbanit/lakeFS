@@ -7,8 +7,10 @@ import (
 	lru "github.com/hnlq715/golang-lru"
 )
 
-type JitterFn func() time.Duration
-type SetFn func() (v interface{}, err error)
+type (
+	JitterFn func() time.Duration
+	SetFn    func() (v interface{}, err error)
+)
 
 type Cache interface {
 	GetOrSet(k interface{}, setFn SetFn) (v interface{}, err error)

@@ -29,7 +29,6 @@ type mockTicker struct {
 }
 
 func (m *mockTicker) Stop() {
-
 }
 
 func (m *mockTicker) makeItTick() {

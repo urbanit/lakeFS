@@ -280,5 +280,6 @@ func getValidInnerIt() block.InventoryIterator {
 				Checksum:        "checksum-1",
 				PhysicalAddress: "/some/path/to/object",
 			},
-		}}
+		},
+	}
 }

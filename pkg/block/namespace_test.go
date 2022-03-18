@@ -160,7 +160,6 @@ func TestResolveNamespace(t *testing.T) {
 				}
 			})
 		}
-
 	}
 }
 

@@ -29,7 +29,6 @@ func TestGetPrimitive(t *testing.T) {
 			err := tx.GetPrimitive(&i, "SELECT 17")
 			return i, err
 		})
-
 		if err != nil {
 			t.Errorf("failed to SELECT 17: %s", err)
 		}
@@ -67,7 +66,6 @@ func TestGet(t *testing.T) {
 			err := tx.Get(&r, "SELECT 17 A, 'foo' B")
 			return &r, err
 		})
-
 		if err != nil {
 			t.Errorf("failed to SELECT 17 and 'foo': %s", err)
 		}

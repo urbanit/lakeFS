@@ -8,9 +8,7 @@ import (
 	"github.com/treeverse/lakefs/pkg/permissions"
 )
 
-var (
-	ErrValidationError = errors.New("validation error")
-)
+var ErrValidationError = errors.New("validation error")
 
 func ValidateAuthEntityID(name string) error {
 	if len(name) == 0 {

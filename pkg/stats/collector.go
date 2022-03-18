@@ -133,6 +133,7 @@ func NewBufferedCollector(installationID string, c *config.Config, opts ...Buffe
 
 	return s
 }
+
 func (s *BufferedCollector) getInstallationID() string {
 	return s.installationID
 }

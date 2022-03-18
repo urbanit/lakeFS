@@ -114,7 +114,8 @@ func SetupTestingEnv(params *SetupTestingEnvParams) (logging.Logger, api.ClientW
 					Value: credentials.Value{
 						AccessKeyID:     viper.GetString("access_key_id"),
 						SecretAccessKey: viper.GetString("secret_access_key"),
-					}})))
+					},
+				})))
 
 	return logger, client, svc
 }

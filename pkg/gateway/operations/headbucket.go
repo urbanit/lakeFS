@@ -12,7 +12,8 @@ func (controller *HeadBucket) RequiredPermissions(_ *http.Request, repoID string
 	return permissions.Node{
 		Permission: permissions.Permission{
 			Action:   permissions.ReadRepositoryAction,
-			Resource: permissions.RepoArn(repoID)},
+			Resource: permissions.RepoArn(repoID),
+		},
 	}, nil
 }
 

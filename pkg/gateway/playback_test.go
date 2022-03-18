@@ -76,7 +76,7 @@ func TestGatewayRecording(t *testing.T) {
 
 			params := makePlaybackParams(basename)
 			_ = os.RemoveAll(params.RecordingDir)
-			_ = os.MkdirAll(params.RecordingDir, 0755)
+			_ = os.MkdirAll(params.RecordingDir, 0o755)
 			deCompressRecordings(filename, params.RecordingDir, params)
 			handler, _ := getBasicHandlerPlayback(t, params)
 			DoTestRun(handler, false, 1.0, t, params)
@@ -110,7 +110,8 @@ func getBasicHandlerPlayback(t *testing.T, params *PlaybackParams) (http.Handler
 
 func getBasicHandler(t *testing.T, authService *simulator.PlayBackMockConf) (http.Handler, *dependencies) {
 	ctx := context.Background()
-	IdTranslator = &testutil.UploadIDTranslator{TransMap: make(map[string]string),
+	IdTranslator = &testutil.UploadIDTranslator{
+		TransMap:   make(map[string]string),
 		ExpectedID: "",
 		T:          t,
 	}

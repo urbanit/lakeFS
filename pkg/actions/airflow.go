@@ -33,9 +33,7 @@ const (
 	airflowConf                 = "dag_conf"
 )
 
-var (
-	errAirflowHookRequestFailed = errors.New("airflow hook request failed")
-)
+var errAirflowHookRequestFailed = errors.New("airflow hook request failed")
 
 func NewAirflowHook(h ActionHook, action *Action) (Hook, error) {
 	airflowHook := Airflow{

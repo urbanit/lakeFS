@@ -7,9 +7,11 @@ import (
 	"github.com/treeverse/lakefs/pkg/cache"
 )
 
-type CredentialSetFn func() (*model.Credential, error)
-type UserSetFn func() (*model.User, error)
-type UserPoliciesSetFn func() ([]*model.Policy, error)
+type (
+	CredentialSetFn   func() (*model.Credential, error)
+	UserSetFn         func() (*model.User, error)
+	UserPoliciesSetFn func() ([]*model.Policy, error)
+)
 
 type Cache interface {
 	GetCredential(accessKeyID string, setFn CredentialSetFn) (*model.Credential, error)
@@ -65,8 +67,7 @@ func (c *LRUCache) GetUserPolicies(userID string, setFn UserPoliciesSetFn) ([]*m
 	return v.([]*model.Policy), nil
 }
 
-type DummyCache struct {
-}
+type DummyCache struct{}
 
 func (d *DummyCache) GetCredential(accessKeyID string, setFn CredentialSetFn) (*model.Credential, error) {
 	return setFn()

@@ -498,7 +498,6 @@ func TestDiffSeek(t *testing.T) {
 				t.Fatalf("ranges in diff different than expected. diff=%s", diff)
 			}
 		})
-
 	}
 }
 

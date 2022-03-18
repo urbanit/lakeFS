@@ -15,8 +15,10 @@ import (
 	"github.com/treeverse/lakefs/pkg/stats"
 )
 
-type clientFactory func(awsSession *session.Session, cfgs ...*aws.Config) s3iface.S3API
-type s3RegionGetter func(ctx context.Context, sess *session.Session, bucket string) (string, error)
+type (
+	clientFactory  func(awsSession *session.Session, cfgs ...*aws.Config) s3iface.S3API
+	s3RegionGetter func(ctx context.Context, sess *session.Session, bucket string) (string, error)
+)
 
 type ClientCache struct {
 	regionToS3Client sync.Map

@@ -18,7 +18,8 @@ func (controller *DeleteObject) RequiredPermissions(_ *http.Request, repoID, _, 
 	return permissions.Node{
 		Permission: permissions.Permission{
 			Action:   permissions.DeleteObjectAction,
-			Resource: permissions.ObjectArn(repoID, path)},
+			Resource: permissions.ObjectArn(repoID, path),
+		},
 	}, nil
 }
 

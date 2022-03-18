@@ -64,9 +64,7 @@ type Statement struct {
 
 type Statements []Statement
 
-var (
-	ErrInvalidStatementSrcFormat = errors.New("invalid statements src format")
-)
+var ErrInvalidStatementSrcFormat = errors.New("invalid statements src format")
 
 func (s Statements) Value() (driver.Value, error) {
 	if s == nil {

@@ -33,7 +33,8 @@ func (controller *PostObject) RequiredPermissions(_ *http.Request, repoID, _, pa
 	return permissions.Node{
 		Permission: permissions.Permission{
 			Action:   permissions.WriteObjectAction,
-			Resource: permissions.ObjectArn(repoID, path)},
+			Resource: permissions.ObjectArn(repoID, path),
+		},
 	}, nil
 }
 

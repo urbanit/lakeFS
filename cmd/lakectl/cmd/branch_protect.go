@@ -17,6 +17,7 @@ var branchProtectCmd = &cobra.Command{
 	Short: "Create and manage branch protection rules",
 	Long:  "Define branch protection rules to prevent direct changes. Changes to protected branches can only be done by merging from other branches.",
 }
+
 var branchProtectListCmd = &cobra.Command{
 	Use:     "list <repo uri>",
 	Short:   "List all branch protection rules",

@@ -1,12 +1,12 @@
 package pyramid
 
 import (
-	"github.com/treeverse/lakefs/pkg/pyramid/params"
-
 	"context"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/treeverse/lakefs/pkg/pyramid/params"
 
 	"github.com/stretchr/testify/require"
 

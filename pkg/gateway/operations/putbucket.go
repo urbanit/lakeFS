@@ -19,7 +19,8 @@ func (controller *PutBucket) RequiredPermissions(_ *http.Request, repoID string)
 			// create-bucket, even if we only want to receive
 			// 409.
 			Action:   permissions.CreateRepositoryAction,
-			Resource: permissions.RepoArn(repoID)},
+			Resource: permissions.RepoArn(repoID),
+		},
 	}, nil
 }
 

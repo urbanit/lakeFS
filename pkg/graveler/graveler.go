@@ -16,8 +16,10 @@ import (
 
 //go:generate mockgen -source=graveler.go -destination=mock/graveler.go -package=mock
 
-const ListingDefaultBatchSize = 1000
-const ListingMaxBatchSize = 100000
+const (
+	ListingDefaultBatchSize = 1000
+	ListingMaxBatchSize     = 100000
+)
 
 // Basic Types
 
@@ -722,6 +724,7 @@ func (id Key) Copy() Key {
 	copy(keyCopy, id)
 	return keyCopy
 }
+
 func (id Key) String() string {
 	return string(id)
 }

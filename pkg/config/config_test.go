@@ -74,7 +74,7 @@ func TestConfig_NewFromFile(t *testing.T) {
 }
 
 func pushEnv(key, value string) func() {
-	var oldValue = os.Getenv(key)
+	oldValue := os.Getenv(key)
 	os.Setenv(key, value)
 	return func() {
 		os.Setenv(key, oldValue)

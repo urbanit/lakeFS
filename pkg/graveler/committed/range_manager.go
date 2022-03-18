@@ -24,11 +24,13 @@ func (k Key) Copy() Key {
 	return c
 }
 
-type Value []byte
-type Record struct {
-	Key   Key
-	Value Value
-}
+type (
+	Value  []byte
+	Record struct {
+		Key   Key
+		Value Value
+	}
+)
 
 type ValueIterator interface {
 	Next() bool
@@ -38,9 +40,7 @@ type ValueIterator interface {
 	Close()
 }
 
-var (
-	ErrNotFound = errors.New("not found")
-)
+var ErrNotFound = errors.New("not found")
 
 type RangeManager interface {
 	// Exists returns true if id references a Range.

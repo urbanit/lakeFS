@@ -19,31 +19,36 @@ func TestParseARN(t *testing.T) {
 			Service:    "repos",
 			Region:     "a",
 			AccountID:  "b",
-			ResourceID: "myrepo"}},
+			ResourceID: "myrepo",
+		}},
 		{Input: "arn:lakefs:repos:a::myrepo", Arn: auth.Arn{
 			Partition:  "lakefs",
 			Service:    "repos",
 			Region:     "a",
 			AccountID:  "",
-			ResourceID: "myrepo"}},
+			ResourceID: "myrepo",
+		}},
 		{Input: "arn:lakefs:repos::b:myrepo", Arn: auth.Arn{
 			Partition:  "lakefs",
 			Service:    "repos",
 			Region:     "",
 			AccountID:  "b",
-			ResourceID: "myrepo"}},
+			ResourceID: "myrepo",
+		}},
 		{Input: "arn:lakefs:repos:::myrepo", Arn: auth.Arn{
 			Partition:  "lakefs",
 			Service:    "repos",
 			Region:     "",
 			AccountID:  "",
-			ResourceID: "myrepo"}},
+			ResourceID: "myrepo",
+		}},
 		{Input: "arn:lakefs:fs:::myrepo/branch/file:with:colon", Arn: auth.Arn{
 			Partition:  "lakefs",
 			Service:    "fs",
 			Region:     "",
 			AccountID:  "",
-			ResourceID: "myrepo/branch/file:with:colon"}},
+			ResourceID: "myrepo/branch/file:with:colon",
+		}},
 	}
 
 	for _, c := range cases {

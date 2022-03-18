@@ -11,11 +11,9 @@ func TestLakectlHelp(t *testing.T) {
 	RunCmdAndVerifySuccessWithFile(t, Lakectl()+" --help", false, "lakectl_help", emptyVars)
 	RunCmdAndVerifySuccessWithFile(t, Lakectl(), true, "lakectl_help", emptyVars)
 	RunCmdAndVerifySuccessWithFile(t, Lakectl()+" --help", true, "lakectl_help", emptyVars)
-
 }
 
 func TestLakectlBasicRepoActions(t *testing.T) {
-
 	// RunCmdAndVerifySuccess(t, Lakectl()+" repo list", false, "\n", emptyVars)
 
 	// Fails due to the usage of repos for isolation - nessie creates repos in parallel and
@@ -168,7 +166,7 @@ func TestLakectlMergeAndStrategies(t *testing.T) {
 	vars["MESSAGE"] = commitMessage
 	RunCmdAndVerifySuccessWithFile(t, Lakectl()+" commit lakefs://"+repoName+"/"+mainBranch+" -m \""+commitMessage+"\"", false, "lakectl_commit", vars)
 
-	//upload 'file2' on 'feature', delete 'file1' and commit
+	// upload 'file2' on 'feature', delete 'file1' and commit
 	vars["BRANCH"] = featureBranch
 	vars["FILE_PATH"] = filePath2
 	RunCmdAndVerifySuccessWithFile(t, Lakectl()+" fs upload -s files/ro_1k lakefs://"+repoName+"/"+featureBranch+"/"+filePath2, false, "lakectl_fs_upload", vars)
@@ -193,7 +191,7 @@ func TestLakectlMergeAndStrategies(t *testing.T) {
 	vars["MESSAGE"] = commitMessage
 	RunCmdAndVerifySuccessWithFile(t, Lakectl()+" commit lakefs://"+repoName+"/"+mainBranch+" -m \""+commitMessage+"\"", false, "lakectl_commit", vars)
 
-	//delete 'file1' on 'feature' again, and commit
+	// delete 'file1' on 'feature' again, and commit
 	vars["BRANCH"] = featureBranch
 	RunCmdAndVerifySuccess(t, Lakectl()+" fs rm lakefs://"+repoName+"/"+featureBranch+"/"+filePath1, false, "", vars)
 	commitMessage = "delete file on feature branch again"
@@ -276,5 +274,4 @@ func TestLakectlAnnotate(t *testing.T) {
 
 	RunCmdAndVerifySuccessWithFile(t, Lakectl()+" annotate lakefs://"+repoName+"/"+mainBranch+"/iii/kkk/l", false, "lakectl_annotate_iiikkklll", vars)
 	RunCmdAndVerifySuccessWithFile(t, Lakectl()+" annotate lakefs://"+repoName+"/"+mainBranch+"/iii/kkk/l --recursive", false, "lakectl_annotate_iiikkklll", vars)
-
 }

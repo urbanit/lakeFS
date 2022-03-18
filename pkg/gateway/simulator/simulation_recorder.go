@@ -62,7 +62,7 @@ func RegisterRecorder(next http.Handler, authService GatewayAuthService, region 
 		return next
 	}
 	recordingDir := filepath.Join(RecordingRoot, testDir)
-	err := os.MkdirAll(recordingDir, 0755) // if needed - create recording directory
+	err := os.MkdirAll(recordingDir, 0o755) // if needed - create recording directory
 	if err != nil {
 		logger.WithError(err).Fatal("FAILED create directory for recordings")
 	}
@@ -90,8 +90,10 @@ func RegisterRecorder(next http.Handler, authService GatewayAuthService, region 
 				// initial post for s3 multipart upload
 				respWriter.UploadIDRegexp = uploadIDRegexp
 			}
-			newBody := &recordingBodyReader{recorder: NewLazyOutput(filepath.Join(recordingDir, nameBase+RequestBodyExtension)),
-				originalBody: r.Body}
+			newBody := &recordingBodyReader{
+				recorder:     NewLazyOutput(filepath.Join(recordingDir, nameBase+RequestBodyExtension)),
+				originalBody: r.Body,
+			}
 			r.Body = newBody
 			defer func() {
 				_ = respWriter.ResponseLog.Close()
@@ -136,7 +138,7 @@ func logRequest(r *http.Request, uploadID []byte, nameBase string, statusCode in
 			Fatal("marshal event as json")
 	}
 	fName := filepath.Join(recordingDir, nameBase+RequestExtension)
-	err = os.WriteFile(fName, jsonEvent, 0600)
+	err = os.WriteFile(fName, jsonEvent, 0o600)
 	if err != nil {
 		logging.Default().
 			WithError(err).
@@ -178,7 +180,7 @@ func createConfFile(r *http.Request, authService GatewayAuthService, region stri
 			WithError(err).
 			Fatal("couldn't marshal configuration")
 	}
-	err = os.WriteFile(filepath.Join(recordingDir, SimulationConfig), confByte, 0644) //nolint:gosec
+	err = os.WriteFile(filepath.Join(recordingDir, SimulationConfig), confByte, 0o644) //nolint:gosec
 	if err != nil {
 		logging.Default().
 			WithError(err).

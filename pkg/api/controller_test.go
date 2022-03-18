@@ -72,7 +72,6 @@ func TestController_ListRepositoriesHandler(t *testing.T) {
 
 	t.Run("list no repos", func(t *testing.T) {
 		resp, err := clt.ListRepositoriesWithResponse(ctx, &api.ListRepositoriesParams{})
-
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1709,7 +1708,7 @@ func TestController_ConfigHandlers(t *testing.T) {
 	clt, deps := setupClientWithAdmin(t, "s3")
 	ctx := context.Background()
 
-	var ExpectedExample = onBlock(deps, "example-bucket/")
+	ExpectedExample := onBlock(deps, "example-bucket/")
 
 	t.Run("Get storage config", func(t *testing.T) {
 		resp, err := clt.GetStorageConfigWithResponse(ctx)
@@ -1964,7 +1963,7 @@ func TestController_MergeDiffWithParent(t *testing.T) {
 
 	diffResp, err := clt.DiffRefsWithResponse(ctx, repoName, "main~1", "main", &api.DiffRefsParams{})
 	verifyResponseOK(t, diffResp, err)
-	var expectedSize = int64(len(content))
+	expectedSize := int64(len(content))
 	expectedResults := []api.Diff{
 		{Path: "file1", PathType: "object", Type: "added", SizeBytes: &expectedSize},
 	}

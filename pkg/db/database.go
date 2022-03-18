@@ -109,6 +109,7 @@ func (d *PgxDatabase) GetPrimitive(ctx context.Context, dest interface{}, query 
 	}
 	return nil
 }
+
 func (d *PgxDatabase) Query(ctx context.Context, query string, args ...interface{}) (rows pgx.Rows, err error) {
 	l := d.getLogger(ctx, logging.Fields{
 		"type":  "start query",

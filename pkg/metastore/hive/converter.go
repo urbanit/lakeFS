@@ -154,6 +154,7 @@ func PartitionHiveToLocal(hivePartition *hive_metastore.Partition) *metastore.Pa
 	}
 	return partition
 }
+
 func PartitionsHiveToLocal(gluePartitions []*hive_metastore.Partition) []*metastore.Partition {
 	partitions := make([]*metastore.Partition, len(gluePartitions))
 	for i, partition := range gluePartitions {
@@ -240,6 +241,7 @@ func SDHiveToLocal(sd *hive_metastore.StorageDescriptor) *metastore.StorageDescr
 		StoredAsSubDirectories: sd.StoredAsSubDirectories,
 	}
 }
+
 func PartitionsLocalToHive(partitions []*metastore.Partition) []*hive_metastore.Partition {
 	gluePartitions := make([]*hive_metastore.Partition, len(partitions))
 	for i, partition := range partitions {
