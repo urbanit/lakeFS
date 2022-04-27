@@ -217,7 +217,7 @@ var runCmd = &cobra.Command{
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 		emailParams, _ := cfg.GetEmailParams()
 		emailer := email.NewEmailer(emailParams)
-		tokenVerifier := auth.NewDBTokenVerifier(dbPool, authService.SecretStore().SharedSecret())
+		tokenVerifier := auth.NewDBTokenVerifier(dbPool, logger.WithField("service", "token_verifier"), authService.SecretStore().SharedSecret())
 		apiHandler := api.Serve(cfg,
 			c,
 			authenticator,

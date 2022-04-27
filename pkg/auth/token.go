@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/treeverse/lakefs/pkg/db"
+	"github.com/treeverse/lakefs/pkg/logging"
 )
 
 type TokenVerifier interface {
@@ -14,8 +15,9 @@ type TokenVerifier interface {
 }
 
 type DBTokenVerifier struct {
-	secret []byte
 	db     db.Database
+	log    logging.Logger
+	secret []byte
 }
 
 func VerifyToken(secret []byte, tokenString string) (*jwt.StandardClaims, error) {
@@ -34,42 +36,44 @@ func VerifyToken(secret []byte, tokenString string) (*jwt.StandardClaims, error)
 
 func (d *DBTokenVerifier) VerifyWithAudience(ctx context.Context, token, audience string) (*jwt.StandardClaims, error) {
 	claims, err := VerifyToken(d.secret, token)
-	if err != nil || !claims.VerifyAudience(audience, true) {
-		return nil, ErrInvalidToken
-	}
-	expired, err := d.IsTokenExpired(ctx, claims.Id)
-	if expired || err != nil {
-		return nil, ErrInvalidToken
-	}
-	err = d.ExpireToken(ctx, claims.Id, time.Unix(claims.ExpiresAt, 0))
 	if err != nil {
 		return nil, err
 	}
-	err = d.RemoveExpiredByTime(ctx)
+	if !claims.VerifyAudience(audience, true) {
+		return nil, ErrInvalidToken
+	}
+	tokenID := claims.Id
+	tokenExpiresAt := time.Unix(claims.ExpiresAt, 0)
+	canUseToken, err := d.markTokenSingleUse(ctx, tokenID, tokenExpiresAt)
 	if err != nil {
 		return nil, err
+	}
+	if !canUseToken {
+		return nil, ErrInvalidToken
 	}
 	return claims, nil
 }
 
-func NewDBTokenVerifier(db db.Database, secret []byte) TokenVerifier {
-	return &DBTokenVerifier{db: db, secret: secret}
+func NewDBTokenVerifier(db db.Database, log logging.Logger, secret []byte) TokenVerifier {
+	return &DBTokenVerifier{
+		db:     db,
+		log:    log,
+		secret: secret,
+	}
 }
 
-// RemoveExpiredByTime removes all the tokens that the token_expires_at passed
-func (d *DBTokenVerifier) RemoveExpiredByTime(ctx context.Context) error {
-	_, err := d.db.Exec(ctx, `DELETE FROM expired_tokens Where token_expires at < $1`, time.Now())
-	return err
-}
-
-func (d *DBTokenVerifier) ExpireToken(ctx context.Context, tokenID string, tokenExpiresAt time.Time) error {
-	_, err := d.db.Exec(ctx, `INSERT INTO expired_tokens (token_id, token_expires_at)
-			VALUES ($1,$2)`, tokenID, tokenExpiresAt)
-	return err
-}
-
-func (d *DBTokenVerifier) IsTokenExpired(ctx context.Context, tokenID string) (bool, error) {
-	tokens := 0
-	err := d.db.Get(ctx, &tokens, `SELECT COUNT(*) FROM expired_tokens where token_id=$1`, tokenID)
-	return tokens >= 0, err
+// markTokenSingleUse returns true if token is valid for single use
+func (d *DBTokenVerifier) markTokenSingleUse(ctx context.Context, tokenID string, tokenExpiresAt time.Time) (bool, error) {
+	res, err := d.db.Exec(ctx, `INSERT INTO expired_tokens (token_id, token_expires_at) VALUES ($1,$2) ON CONFLICT DO NOTHING`,
+		tokenID, tokenExpiresAt)
+	if err != nil {
+		return false, err
+	}
+	canUseToken := res.RowsAffected() == 1
+	// cleanup old tokens
+	_, err = d.db.Exec(ctx, `DELETE FROM expired_tokens WHERE token_expires at < $1`, time.Now())
+	if err != nil {
+		d.log.WithError(err).Error("delete expired tokens")
+	}
+	return canUseToken, nil
 }
