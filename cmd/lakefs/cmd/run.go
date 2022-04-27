@@ -218,7 +218,21 @@ var runCmd = &cobra.Command{
 		emailParams, _ := cfg.GetEmailParams()
 		emailer := email.NewEmailer(emailParams)
 		tokenVerifier := auth.NewDBTokenVerifier(dbPool, authService.SecretStore().SharedSecret())
-		apiHandler := api.Serve(cfg, c, authenticator, authService, blockStore, authMetadataManager, migrator, bufferedCollector, cloudMetadataProvider, actionsService, auditChecker, logger.WithField("service", "api_gateway"), emailer, cfg.GetS3GatewayDomainNames(), tokenVerifier)
+		apiHandler := api.Serve(cfg,
+			c,
+			authenticator,
+			authService,
+			blockStore,
+			authMetadataManager,
+			migrator,
+			bufferedCollector,
+			cloudMetadataProvider,
+			actionsService,
+			auditChecker,
+			logger.WithField("service", "api_gateway"),
+			emailer,
+			cfg.GetS3GatewayDomainNames(),
+			tokenVerifier)
 
 		// init gateway server
 		s3Fallback := cfg.GetS3GatewayFallbackURL()
