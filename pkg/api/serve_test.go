@@ -113,22 +113,7 @@ func setupHandler(t testing.TB, opts ...testutil.GetDBOption) (http.Handler, *de
 	emailParams, _ := cfg.GetEmailParams()
 	emailer := email.NewEmailer(emailParams)
 
-	handler := api.Serve(
-		cfg,
-		c,
-		authenticator,
-		authService,
-		c.BlockAdapter,
-		meta,
-		migrator,
-		collector,
-		nil,
-		actionsService,
-		auditChecker,
-		logging.Default(),
-		emailer,
-		nil,
-	)
+	handler := api.Serve(cfg, c, authenticator, authService, c.BlockAdapter, meta, migrator, collector, nil, actionsService, auditChecker, logging.Default(), emailer, nil, nil)
 
 	return handler, &dependencies{
 		blocks:      c.BlockAdapter,

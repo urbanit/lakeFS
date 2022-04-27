@@ -80,6 +80,7 @@ type Controller struct {
 	AuditChecker          AuditChecker
 	Logger                logging.Logger
 	Emailer               *email.Emailer
+	TokenVerifier         auth.TokenVerifier
 }
 
 func (c *Controller) GetAuthCapabilities(w http.ResponseWriter, r *http.Request) {
@@ -3116,7 +3117,7 @@ func (c *Controller) ForgotPassword(w http.ResponseWriter, r *http.Request, body
 }
 
 func (c *Controller) UpdatePassword(w http.ResponseWriter, r *http.Request, body UpdatePasswordJSONRequestBody) {
-	claims, err := VerifyResetPasswordToken(c.Auth, body.Token)
+	claims, err := c.TokenVerifier.VerifyWithAudience(nil, body.Token, ResetPasswordAudience)
 	if err != nil {
 		c.Logger.WithError(err).WithField("token", body.Token).Debug("failed to verify token")
 		writeError(w, http.StatusUnauthorized, err)
@@ -3296,21 +3297,7 @@ func resolvePathList(objects *[]string, prefixes *[]string) []catalog.PathRecord
 	return pathRecords
 }
 
-func NewController(
-	cfg *config.Config,
-	catalog catalog.Interface,
-	authenticator auth.Authenticator,
-	authService auth.Service,
-	blockAdapter block.Adapter,
-	metadataManager auth.MetadataManager,
-	migrator db.Migrator,
-	collector stats.Collector,
-	cloudMetadataProvider cloud.MetadataProvider,
-	actions actionsHandler,
-	auditChecker AuditChecker,
-	logger logging.Logger,
-	emailer *email.Emailer,
-) *Controller {
+func NewController(cfg *config.Config, catalog catalog.Interface, authenticator auth.Authenticator, authService auth.Service, blockAdapter block.Adapter, metadataManager auth.MetadataManager, migrator db.Migrator, collector stats.Collector, cloudMetadataProvider cloud.MetadataProvider, actions actionsHandler, auditChecker AuditChecker, logger logging.Logger, emailer *email.Emailer, tokenVerifier auth.TokenVerifier) *Controller {
 	return &Controller{
 		Config:                cfg,
 		Catalog:               catalog,
@@ -3325,6 +3312,7 @@ func NewController(
 		AuditChecker:          auditChecker,
 		Logger:                logger,
 		Emailer:               emailer,
+		TokenVerifier:         tokenVerifier,
 	}
 }
 

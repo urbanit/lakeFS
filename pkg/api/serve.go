@@ -38,22 +38,7 @@ type responseError struct {
 	Message string `json:"message"`
 }
 
-func Serve(
-	cfg *config.Config,
-	catalog catalog.Interface,
-	authenticator auth.Authenticator,
-	authService auth.Service,
-	blockAdapter block.Adapter,
-	metadataManager auth.MetadataManager,
-	migrator db.Migrator,
-	collector stats.Collector,
-	cloudMetadataProvider cloud.MetadataProvider,
-	actions actionsHandler,
-	auditChecker AuditChecker,
-	logger logging.Logger,
-	emailer *email.Emailer,
-	gatewayDomains []string,
-) http.Handler {
+func Serve(cfg *config.Config, catalog catalog.Interface, authenticator auth.Authenticator, authService auth.Service, blockAdapter block.Adapter, metadataManager auth.MetadataManager, migrator db.Migrator, collector stats.Collector, cloudMetadataProvider cloud.MetadataProvider, actions actionsHandler, auditChecker AuditChecker, logger logging.Logger, emailer *email.Emailer, gatewayDomains []string, tokener auth.TokenVerifier) http.Handler {
 	logger.Info("initialize OpenAPI server")
 	swagger, err := GetSwagger()
 	if err != nil {
@@ -71,22 +56,7 @@ func Serve(
 		AuthMiddleware(logger, swagger, authenticator, authService),
 		MetricsMiddleware(swagger),
 	)
-
-	controller := NewController(
-		cfg,
-		catalog,
-		authenticator,
-		authService,
-		blockAdapter,
-		metadataManager,
-		migrator,
-		collector,
-		cloudMetadataProvider,
-		actions,
-		auditChecker,
-		logger,
-		emailer,
-	)
+	controller := NewController(cfg, catalog, authenticator, authService, blockAdapter, metadataManager, migrator, collector, cloudMetadataProvider, actions, auditChecker, logger, emailer, tokener)
 	HandlerFromMuxWithBaseURL(controller, apiRouter, BaseURL)
 
 	r.Mount("/_health", httputil.ServeHealth())
