@@ -26,6 +26,7 @@ const (
 
 	LoginAudience         = "login"
 	ResetPasswordAudience = "reset_password"
+	LoginOnceAudience     = "login_once"
 )
 
 func generateJWT(claims *jwt.StandardClaims, secret []byte) (string, error) {

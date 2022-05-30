@@ -1148,6 +1148,35 @@ paths:
                 $ref: "#/components/schemas/CurrentUser"
 
   /auth/login:
+    get:
+      tags:
+        - auth
+      operationId: loginToken
+      summary: perform a login using a token
+      security: []
+      parameters:
+        - in: query
+          name: t
+          description: login using a login_single token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful login
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "access_token=abcde12356; Path=/; HttpOnly"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationToken"
+        401:
+          $ref: "#/components/responses/Unauthorized"
+        default:
+          $ref: "#/components/responses/ServerError"
     post:
       tags:
         - auth

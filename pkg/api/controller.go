@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -170,6 +171,56 @@ func (c *Controller) Logout(w http.ResponseWriter, _ *http.Request) {
 	})
 
 	writeResponse(w, http.StatusOK, nil)
+}
+
+func (c *Controller) LoginToken(w http.ResponseWriter, r *http.Request, params LoginTokenParams) {
+	ctx := r.Context()
+	token := params.T
+	claims, err := VerifyLoginOneToken(ctx, c.Auth, token)
+	if err != nil {
+		writeResponse(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+	const base = 10
+	const bitSize = 64
+	var id int64
+	id, err = strconv.ParseInt(claims.Subject, base, bitSize)
+	if err != nil {
+		writeResponse(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	user, err := c.Auth.GetUserByID(ctx, id)
+	if err != nil {
+		writeResponse(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	loginTime := time.Now()
+	expires := loginTime.Add(DefaultLoginExpiration)
+	secret := c.Auth.SecretStore().SharedSecret()
+
+	// user.Username will be different from username/access_key_id on
+	// LDAP login.  Use the stored value.
+	tokenString, err := GenerateJWTLogin(secret, user.ID, loginTime, expires)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     JWTCookieName,
+		Value:    tokenString,
+		Path:     "/",
+		Domain:   c.Config.GetCookieDomain(), // if not configured will return empty string which will resolve by setting the cookie on the current domain
+		Expires:  expires,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+	response := AuthenticationToken{
+		Token: tokenString,
+	}
+	writeResponse(w, http.StatusOK, response)
 }
 
 func (c *Controller) Login(w http.ResponseWriter, r *http.Request, body LoginJSONRequestBody) {

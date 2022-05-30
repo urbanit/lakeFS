@@ -66,15 +66,10 @@ func checkSecurityRequirements(r *http.Request, securityRequirements openapi3.Se
 			switch provider {
 			case "jwt_token":
 				// validate jwt token from header
-				authHeaderValue := r.Header.Get("Authorization")
-				if authHeaderValue == "" {
+				token := getAuthorizationToken(r)
+				if len(token) == 0 {
 					continue
 				}
-				parts := strings.Fields(authHeaderValue)
-				if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
-					continue
-				}
-				token := parts[1]
 				user, err = userByToken(ctx, logger, authService, token)
 			case "basic_auth":
 				// validate using basic auth
@@ -104,6 +99,18 @@ func checkSecurityRequirements(r *http.Request, securityRequirements openapi3.Se
 		}
 	}
 	return nil, nil
+}
+
+func getAuthorizationToken(r *http.Request) string {
+	authHeaderValue := r.Header.Get("Authorization")
+	if authHeaderValue == "" {
+		return ""
+	}
+	parts := strings.Fields(authHeaderValue)
+	if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
+		return ""
+	}
+	return parts[1]
 }
 
 func userByToken(ctx context.Context, logger logging.Logger, authService auth.Service, tokenString string) (*model.User, error) {
@@ -153,6 +160,21 @@ func userByAuth(ctx context.Context, logger logging.Logger, authenticator auth.A
 func VerifyResetPasswordToken(ctx context.Context, authService auth.Service, token string) (*jwt.StandardClaims, error) {
 	secret := authService.SecretStore().SharedSecret()
 	claims, err := auth.VerifyTokenWithAudience(secret, token, ResetPasswordAudience)
+	if err != nil {
+		return nil, err
+	}
+	tokenID := claims.Id
+	tokenExpiresAt := claims.ExpiresAt
+	err = authService.ClaimTokenIDOnce(ctx, tokenID, tokenExpiresAt)
+	if err != nil {
+		return nil, err
+	}
+	return claims, nil
+}
+
+func VerifyLoginOneToken(ctx context.Context, authService auth.Service, token string) (*jwt.StandardClaims, error) {
+	secret := authService.SecretStore().SharedSecret()
+	claims, err := auth.VerifyTokenWithAudience(secret, token, LoginOnceAudience)
 	if err != nil {
 		return nil, err
 	}

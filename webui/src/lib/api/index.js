@@ -181,6 +181,23 @@ class Auth {
         return user;
     }
 
+    async login_token(t) {
+        const query = qs({t});
+        const response = await fetch(`${API_ENDPOINT}/auth/login?${query}`, {
+            headers: new Headers(defaultAPIHeaders),
+            method: 'GET',
+        });
+        if (response.status === 401) {
+            throw new AuthenticationError('invalid credentials');
+        }
+        if (response.status !== 200) {
+            throw new AuthenticationError('unknown authentication error');
+        }
+        const user = await this.getCurrentUser();
+        cache.set('user',user);
+        return user;
+    }
+
     async logout() {
         const response = await fetch(`${API_ENDPOINT}/auth/logout`, {
             headers: new Headers(defaultAPIHeaders),
@@ -887,6 +904,7 @@ class MetaRanges {
         return response.json();
     }
 }
+
 export const repositories = new Repositories();
 export const branches = new Branches();
 export const tags = new Tags();
