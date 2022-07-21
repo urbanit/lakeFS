@@ -558,7 +558,6 @@ func (s *DBAuthService) ListUserGroups(ctx context.Context, username string, par
 		p.Amount = len(groups)
 		return &res{groups, p}, nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
@@ -604,26 +603,34 @@ func (s *DBAuthService) ListGroupUsers(ctx context.Context, groupDisplayName str
 		p.Amount = len(users)
 		return &res{users, p}, nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
 	return result.(*res).users, result.(*res).paginator, nil
 }
 
-func (s *DBAuthService) WritePolicy(ctx context.Context, policy *model.Policy) error {
+func (s *DBAuthService) CreatePolicy(ctx context.Context, policy *model.Policy) error {
 	_, err := s.db.Transact(ctx, func(tx db.Tx) (interface{}, error) {
 		if err := ValidatePolicy(policy); err != nil {
 			return nil, err
 		}
-		var id int64
-
-		return nil, tx.Get(&id, `
+		_, err := tx.Exec(`
 			INSERT INTO auth_policies (display_name, created_at, statement)
-			VALUES ($1, $2, $3)
-			ON CONFLICT (display_name) DO UPDATE SET statement = $3
-			RETURNING id`,
+			VALUES ($1, $2, $3)`,
 			policy.DisplayName, policy.CreatedAt, policy.Statement)
+		return nil, err
+	})
+	return err
+}
+
+func (s *DBAuthService) UpdatePolicy(ctx context.Context, policy *model.Policy) error {
+	_, err := s.db.Transact(ctx, func(tx db.Tx) (interface{}, error) {
+		if err := ValidatePolicy(policy); err != nil {
+			return nil, err
+		}
+		_, err := tx.Exec(`UPDATE auth_policies SET created_at=$2, statement=$3 WHERE display_name=$1`,
+			policy.DisplayName, policy.CreatedAt, policy.Statement)
+		return nil, err
 	})
 	return err
 }
@@ -678,7 +685,6 @@ func (s *DBAuthService) ListPolicies(ctx context.Context, params *model.Paginati
 		p.Amount = len(policies)
 		return &res{policies, p}, nil
 	})
-
 	if err != nil {
 		return nil, nil, err
 	}
@@ -864,7 +870,6 @@ func (s *DBAuthService) Authorize(ctx context.Context, req *AuthorizationRequest
 		After:  "", // all
 		Amount: -1, // all
 	})
-
 	if err != nil {
 		return nil, err
 	}

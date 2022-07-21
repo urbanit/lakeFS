@@ -29,7 +29,7 @@ func createGroups(ctx context.Context, authService Service, groups []*model.Grou
 
 func createPolicies(ctx context.Context, authService Service, policies []*model.Policy) error {
 	for _, policy := range policies {
-		err := authService.WritePolicy(ctx, policy)
+		err := authService.CreatePolicy(ctx, policy)
 		if err != nil {
 			return err
 		}

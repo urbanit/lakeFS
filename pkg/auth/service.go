@@ -99,7 +99,8 @@ type Service interface {
 	ListGroupUsers(ctx context.Context, groupDisplayName string, params *model.PaginationParams) ([]*model.User, *model.Paginator, error)
 
 	// policies
-	WritePolicy(ctx context.Context, policy *model.Policy) error
+	CreatePolicy(ctx context.Context, policy *model.Policy) error
+	UpdatePolicy(ctx context.Context, policy *model.Policy) error
 	GetPolicy(ctx context.Context, policyDisplayName string) (*model.Policy, error)
 	DeletePolicy(ctx context.Context, policyDisplayName string) error
 	ListPolicies(ctx context.Context, params *model.PaginationParams) ([]*model.Policy, *model.Paginator, error)
@@ -740,19 +741,45 @@ func ValidatePolicy(policy *model.Policy) error {
 	return nil
 }
 
-func (s *KVAuthService) WritePolicy(ctx context.Context, policy *model.Policy) error {
+func (s *KVAuthService) CreatePolicy(ctx context.Context, policy *model.Policy) error {
 	if err := ValidatePolicy(policy); err != nil {
 		return err
 	}
 	policyKey := model.PolicyPath(policy.DisplayName)
-
 	m := model.ProtoFromPolicy(policy)
 	err := s.store.SetMsgIf(ctx, model.PartitionKey, policyKey, m, nil)
 	if err != nil {
 		if errors.Is(err, kv.ErrPredicateFailed) {
 			err = ErrAlreadyExists
 		}
-		return fmt.Errorf("save policy (policyKey %s): %w", policyKey, err)
+		return fmt.Errorf("create policy (policyKey %s): %w", policyKey, err)
+	}
+	return err
+}
+
+func (s *KVAuthService) UpdatePolicy(ctx context.Context, policy *model.Policy) error {
+	if err := ValidatePolicy(policy); err != nil {
+		return err
+	}
+	policyKey := model.PolicyPath(policy.DisplayName)
+
+	p := model.PolicyData{}
+	_, err := s.store.GetMsg(ctx, model.PartitionKey, policyKey, &p)
+	if err != nil {
+		if errors.Is(err, kv.ErrNotFound) {
+			err = ErrNotFound
+		}
+		return fmt.Errorf("%s: %w", policyKey, err)
+	}
+
+	m := model.ProtoFromPolicy(policy)
+	err = s.store.SetMsgIf(ctx, model.PartitionKey, policyKey, m, p)
+	if err != nil {
+		// TODO(barak): if the key was updated and/or deleted can we update the policy?
+		if errors.Is(err, kv.ErrPredicateFailed) {
+			err = ErrAlreadyExists
+		}
+		return fmt.Errorf("update policy (policyKey %s): %w", policyKey, err)
 	}
 	return err
 }
@@ -1449,7 +1476,31 @@ func (a *APIAuthService) ListGroupUsers(ctx context.Context, groupDisplayName st
 	return members, toPagination(resp.JSON200.Pagination), nil
 }
 
-func (a *APIAuthService) WritePolicy(ctx context.Context, policy *model.Policy) error {
+func (a *APIAuthService) CreatePolicy(ctx context.Context, policy *model.Policy) error {
+	if err := model.ValidateAuthEntityID(policy.DisplayName); err != nil {
+		return err
+	}
+	stmts := make([]Statement, len(policy.Statement))
+	for i, s := range policy.Statement {
+		stmts[i] = Statement{
+			Action:   s.Action,
+			Effect:   s.Effect,
+			Resource: s.Resource,
+		}
+	}
+	createdAt := policy.CreatedAt.Unix()
+	resp, err := a.apiClient.CreatePolicyWithResponse(ctx, CreatePolicyJSONRequestBody{
+		CreationDate: &createdAt,
+		Name:         policy.DisplayName,
+		Statement:    stmts,
+	})
+	if err != nil {
+		return err
+	}
+	return a.validateResponse(resp, http.StatusCreated)
+}
+
+func (a *APIAuthService) UpdatePolicy(ctx context.Context, policy *model.Policy) error {
 	if err := model.ValidateAuthEntityID(policy.DisplayName); err != nil {
 		return err
 	}
@@ -1463,7 +1514,7 @@ func (a *APIAuthService) WritePolicy(ctx context.Context, policy *model.Policy) 
 	}
 	createdAt := policy.CreatedAt.Unix()
 
-	resp, err := a.apiClient.CreatePolicyWithResponse(ctx, CreatePolicyJSONRequestBody{
+	resp, err := a.apiClient.UpdatePolicyWithResponse(ctx, policy.DisplayName, UpdatePolicyJSONRequestBody{
 		CreationDate: &createdAt,
 		Name:         policy.DisplayName,
 		Statement:    stmts,

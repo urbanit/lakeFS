@@ -65,7 +65,7 @@ func prepareTestData(t *testing.T, ctx context.Context, svc auth.Service) {
 	createGroupWithUsers(t, ctx, svc, groupNames[2], userNames[3:8])
 	createGroupWithUsers(t, ctx, svc, groupNames[3], userNames[6:16])
 
-	policies := writePolicies(t, ctx, svc, NumUsers/2+1)
+	policies := createPolicies(t, ctx, svc, NumUsers/2+1)
 	for i := 1; i <= NumUsers/2; i++ {
 		for j := 0; j < NumUsers; j += i {
 			if err := svc.AttachPolicyToUser(ctx, policies[i], userNames[j]); err != nil {
@@ -122,17 +122,17 @@ func createGroupWithUsers(t *testing.T, ctx context.Context, svc auth.Service, g
 	}
 }
 
-func writePolicies(t *testing.T, ctx context.Context, svc auth.Service, num int) []string {
+func createPolicies(t *testing.T, ctx context.Context, svc auth.Service, num int) []string {
 	var names []string
 	for i := 0; i < num; i++ {
-		names = append(names, writePolicy(t, ctx, svc))
+		names = append(names, createPolicy(t, ctx, svc))
 	}
 	return names
 }
 
-func writePolicy(t *testing.T, ctx context.Context, svc auth.Service) string {
+func createPolicy(t *testing.T, ctx context.Context, svc auth.Service) string {
 	policyName := generateUniqueName("policy")
-	if err := svc.WritePolicy(ctx, &model.Policy{
+	if err := svc.CreatePolicy(ctx, &model.Policy{
 		DisplayName: policyName,
 		Statement: model.Statements{
 			{
@@ -146,7 +146,7 @@ func writePolicy(t *testing.T, ctx context.Context, svc auth.Service) string {
 			},
 		},
 	}); err != nil {
-		t.Fatalf("WritePolicy(%s): %s", policyName, err)
+		t.Fatalf("CreatePolicy(%s): %s", policyName, err)
 	}
 	return policyName
 }

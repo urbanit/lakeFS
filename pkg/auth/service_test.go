@@ -34,20 +34,21 @@ var (
 	psql        = sq.StatementBuilder.PlaceholderFormat(sq.Dollar)
 	someSecret  = []byte("some secret")
 
-	userPoliciesForTesting = []*model.Policy{{
-		Statement: model.Statements{
-			{
-				Action:   []string{"auth:DeleteUser"},
-				Resource: "arn:lakefs:auth:::user/foobar",
-				Effect:   model.StatementEffectAllow,
-			},
-			{
-				Action:   []string{"auth:*"},
-				Resource: "*",
-				Effect:   model.StatementEffectDeny,
+	userPoliciesForTesting = []*model.Policy{
+		{
+			Statement: model.Statements{
+				{
+					Action:   []string{"auth:DeleteUser"},
+					Resource: "arn:lakefs:auth:::user/foobar",
+					Effect:   model.StatementEffectAllow,
+				},
+				{
+					Action:   []string{"auth:*"},
+					Resource: "*",
+					Effect:   model.StatementEffectDeny,
+				},
 			},
 		},
-	},
 	}
 )
 
@@ -113,7 +114,7 @@ func userWithPolicies(t testing.TB, s auth.Service, policies []*model.Policy) st
 		if policy.DisplayName == "" {
 			policy.DisplayName = model.CreateID()
 		}
-		err := s.WritePolicy(ctx, policy)
+		err := s.CreatePolicy(ctx, policy)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -256,15 +257,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 	}{
 		{
 			name: "basic_allowed",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"fs:WriteObject"},
-						Resource: "arn:lakefs:fs:::repository/foo/object/bar",
-						Effect:   model.StatementEffectAllow,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"fs:WriteObject"},
+							Resource: "arn:lakefs:fs:::repository/foo/object/bar",
+							Effect:   model.StatementEffectAllow,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -282,15 +284,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "basic_disallowed",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"fs:WriteObject"},
-						Resource: "arn:lakefs:fs:::repository/foo/object/bar",
-						Effect:   model.StatementEffectDeny,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"fs:WriteObject"},
+							Resource: "arn:lakefs:fs:::repository/foo/object/bar",
+							Effect:   model.StatementEffectDeny,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -308,15 +311,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "policy_with_wildcard",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"fs:WriteObject"},
-						Resource: "arn:lakefs:fs:::repository/foo/object/*",
-						Effect:   model.StatementEffectAllow,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"fs:WriteObject"},
+							Resource: "arn:lakefs:fs:::repository/foo/object/*",
+							Effect:   model.StatementEffectAllow,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -334,15 +338,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "policy_with_invalid_user",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"auth:CreateUser"},
-						Resource: "arn:lakefs:auth:::user/${user}",
-						Effect:   model.StatementEffectAllow,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"auth:CreateUser"},
+							Resource: "arn:lakefs:auth:::user/${user}",
+							Effect:   model.StatementEffectAllow,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -385,15 +390,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "policy_with_other_user",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"auth:CreateUser"},
-						Resource: "arn:lakefs:auth:::user/${user}",
-						Effect:   model.StatementEffectAllow,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"auth:CreateUser"},
+							Resource: "arn:lakefs:auth:::user/${user}",
+							Effect:   model.StatementEffectAllow,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -411,15 +417,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "policy_with_wildcard",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"auth:CreateUser"},
-						Resource: "arn:lakefs:auth:::user/*",
-						Effect:   model.StatementEffectAllow,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"auth:CreateUser"},
+							Resource: "arn:lakefs:auth:::user/*",
+							Effect:   model.StatementEffectAllow,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -437,15 +444,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "action_passing_wildcards",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"auth:Create*"},
-						Resource: "arn:lakefs:auth:::user/foobar",
-						Effect:   model.StatementEffectAllow,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"auth:Create*"},
+							Resource: "arn:lakefs:auth:::user/foobar",
+							Effect:   model.StatementEffectAllow,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -463,15 +471,16 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "action_other_wildcards",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"auth:Create*"},
-						Resource: "arn:lakefs:auth:::user/foobar",
-						Effect:   model.StatementEffectAllow,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"auth:Create*"},
+							Resource: "arn:lakefs:auth:::user/foobar",
+							Effect:   model.StatementEffectAllow,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -489,20 +498,21 @@ func TestDBAuthService_Authorize(t *testing.T) {
 		},
 		{
 			name: "action_denying_wildcards",
-			policies: []*model.Policy{{
-				Statement: model.Statements{
-					{
-						Action:   []string{"auth:DeleteUser"},
-						Resource: "arn:lakefs:auth:::user/foobar",
-						Effect:   model.StatementEffectAllow,
-					},
-					{
-						Action:   []string{"auth:*"},
-						Resource: "*",
-						Effect:   model.StatementEffectDeny,
+			policies: []*model.Policy{
+				{
+					Statement: model.Statements{
+						{
+							Action:   []string{"auth:DeleteUser"},
+							Resource: "arn:lakefs:auth:::user/foobar",
+							Effect:   model.StatementEffectAllow,
+						},
+						{
+							Action:   []string{"auth:*"},
+							Resource: "*",
+							Effect:   model.StatementEffectDeny,
+						},
 					},
 				},
-			},
 			},
 			request: func(userName string) *auth.AuthorizationRequest {
 				return &auth.AuthorizationRequest{
@@ -751,7 +761,6 @@ func TestDBAuthService_ListGroups(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestDbAuthService_GetUser(t *testing.T) {
@@ -1206,8 +1215,8 @@ func createInitialDataSet(t *testing.T, ctx context.Context, svc auth.Service, u
 
 	numPolicies := len(policyNames)
 	for i, policyName := range policyNames {
-		if err := svc.WritePolicy(ctx, &model.Policy{DisplayName: policyName, Statement: userPoliciesForTesting[0].Statement}); err != nil {
-			t.Fatalf("WritePolicy(%s): %s", policyName, err)
+		if err := svc.CreatePolicy(ctx, &model.Policy{DisplayName: policyName, Statement: userPoliciesForTesting[0].Statement}); err != nil {
+			t.Fatalf("CreatePolicy(%s): %s", policyName, err)
 		}
 		if i < numPolicies/2 {
 			for _, userName := range userNames {

@@ -706,7 +706,7 @@ func (c *Controller) CreatePolicy(w http.ResponseWriter, r *http.Request, body C
 		Statement:   stmts,
 	}
 
-	err := c.Auth.WritePolicy(ctx, p)
+	err := c.Auth.CreatePolicy(ctx, p)
 	if handleAPIError(w, err) {
 		return
 	}
@@ -786,7 +786,7 @@ func (c *Controller) UpdatePolicy(w http.ResponseWriter, r *http.Request, body U
 		DisplayName: policyID,
 		Statement:   stmts,
 	}
-	err := c.Auth.WritePolicy(ctx, p)
+	err := c.Auth.UpdatePolicy(ctx, p)
 	if handleAPIError(w, err) {
 		return
 	}
@@ -3273,7 +3273,6 @@ func (c *Controller) ExpandTemplate(w http.ResponseWriter, r *http.Request, temp
 		}
 	}
 	err := c.Templater.Expand(r.Context(), w, u, templateLocation, p.Params.AdditionalProperties)
-
 	if err != nil {
 		c.Logger.WithError(err).WithField("location", templateLocation).Error("Template expansion failed")
 	}
